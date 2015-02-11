@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+	<meta charset="UTF-8">
+	<!-- CSS -->
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+	<link rel="stylesheet" type="text/css" href="css/animation.css">
+	<link rel="stylesheet" type="text/css" href="css/fontello.css">
+	<link rel="stylesheet" type="text/css" href="css/fontello-codes.css">
+	<link rel="stylesheet" type="text/css" href="css/fontello-embedded.css">
+	<!-- SCRIPTS -->
+	<script src="js/jquery-2.1.3.min.js" type="text/javascript"></script>
+	<script src="js/app.js" type="text/javascript"></script>
+	<title>Usinacraft - Launcher - Alpha 2.0</title>
+</head>
+<body>
+	<div id="main-background"></div>
+	<header id="header">
+		<a href="http://usinacraft.ch" class="external-link" target="_blank"><img id="main-logo" src="css/images/favicon.png" alt="Logo"></a>
+		<h1 id="main-title">Usinacraft</h1>
+	</header>
+	<div id="content">
+		<div class="basic-panel">
+			<div class="basic-content">
+				<form method="POST" action="#" id="main-version" class="basic-form">
+					<div class="row">
+						<label for="version" class="basic-label">Choissisez la version d'Usinacraft : </label>
+						<select name="version" id="version" class="basic-select" disabled>
+							<option>Chargement en cours...</option>
+						</select>
+					</div>
+					<div class="row">
+						<div class="loadbar" id="loadbar">
+							<div class="loader" ></div>
+						</div>
+						<p id="loadbar-info" class="loadbar-info"></p>
+					</div>
+					<div class="min-row login">
+						<button class="basic-button" type="submit">Connexion</button>
+						<div class="basic-checkbox">
+							<input type="checkbox" name="force-update" id="force-update">
+							<label for="force-update">Forcer la mise à jour</label>
+						</div>
+						<div class="basic-checkbox">
+							<input type="checkbox" name="reset-profile" id="reset-profile">
+							<label for="reset-profile">Réinstaller le profil "Usinacraft"</label>
+						</div>
+					</div>
+					<div class="min-row installs">
+						<p>Dossier d'installation : <input type="file" webkitdirectory class="basic-button" id="installation-folder" value="Dossier d'installation"></p>
+						<p title="Launcher à lancer après l'installation d'Usinacraft">Launcher Minecraft : <input type="file" class="basic-button" id="minecraft-launcher" accept=".exe"></p>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	<footer id="footer">
+		<p class="social-links">
+			<a href="https://www.twitter.com/UsinacraftServ" class="icon-twitter external-link"></a>
+			<a href="https://www.facebook.com/pages/Usinacraft/347382971958758" class="icon-facebook external-link"></a>
+		</p>
+	</footer>
+</body>
+</html>

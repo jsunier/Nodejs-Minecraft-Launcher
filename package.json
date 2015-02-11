@@ -1,0 +1,36 @@
+{
+  "name": "usinacraft-launcher",
+  "main": "index.html",
+  "description": "Launcher officiel d'Usinacraft",
+  "version": "0.1.0",
+  "keywords": [
+    "usinacraft",
+    "minecraft",
+    "mods",
+    "suisse",
+    "ProTeK"
+  ],
+  "window": {
+    "title": "Usinacraft - Launcher - Alpha 2.0",
+    "icon": "css/images/favicon.png",
+    "toolbar": true,
+    "resizable": false,
+    "width": 800,
+    "height": 530
+  },
+  "webkit": {
+    "java": true
+  },
+  "maintainers": [
+    {
+      "name": "ProTeK",
+      "email": "exitedprotek@gmail.com",
+      "web": "https://www.twitter.com/ExiTed_ProTeK"
+    }
+  ],
+  "dependencies": {
+    "dld": "0.0.2",
+    "is-version-newer": "~1.0.2",
+    "memory-cache": "0.0.5"
+  }
+}

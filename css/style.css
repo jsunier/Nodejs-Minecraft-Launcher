@@ -1,0 +1,362 @@
+@charset "UTF-8";
+/*=================================
+=            Variables            =
+=================================*/
+/*==========  Fonts  ==========*/
+@font-face {
+  font-family: 'Roboto';
+  src: url("fonts/roboto-regular-webfont.eot");
+  src: url("fonts/roboto-regular-webfont.eot?#iefix") format("embedded-opentype"), url("fonts/roboto-regular-webfont.woff2") format("woff2"), url("fonts/roboto-regular-webfont.woff") format("woff"), url("fonts/roboto-regular-webfont.ttf") format("truetype"), url("fonts/roboto-regular-webfont.svg#robotoregular") format("svg");
+  font-weight: normal;
+  font-style: normal;
+}
+/*===========================================
+=            Usinacraft Launcher            =
+===========================================*/
+/* line 23, ../scss/style.scss */
+body {
+  background: #03A9F4;
+  height: 100%;
+  font-family: 'Roboto';
+  font-size: 16px;
+  margin: 0;
+  padding: 0;
+}
+
+/* line 32, ../scss/style.scss */
+a, a:visited {
+  color: #03A9F4;
+}
+
+/* line 36, ../scss/style.scss */
+#main-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  opacity: 0;
+  z-index: -1;
+  min-height: 100%;
+  background-image: url("images/background.png");
+  background-size: 100%;
+  background-position: 0 80px;
+  background-repeat: no-repeat;
+}
+
+/* line 51, ../scss/style.scss */
+#header {
+  background: #0286c2;
+  width: 100%;
+  height: 80px;
+  margin-bottom: 25px;
+  border-bottom: 2px solid #383838;
+  -moz-box-shadow: 0 2px 8px #3b3b3b;
+  -webkit-box-shadow: 0 2px 8px #3b3b3b;
+  box-shadow: 0 2px 8px #3b3b3b;
+}
+/* line 58, ../scss/style.scss */
+#header #main-logo {
+  display: inline-block;
+  float: left;
+  margin: 10px;
+  max-height: 80%;
+}
+/* line 64, ../scss/style.scss */
+#header #main-title {
+  float: left;
+  margin-top: 18px;
+  margin-left: 15px;
+  color: #FAFAFA;
+}
+
+/* line 72, ../scss/style.scss */
+#footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  border-top: 2px solid #383838;
+  background: #0286c2;
+  height: 60px;
+}
+/* line 80, ../scss/style.scss */
+#footer .social-links {
+  margin: 5px 60px;
+  padding: 0;
+}
+/* line 83, ../scss/style.scss */
+#footer .social-links a {
+  color: #FAFAFA;
+  text-decoration: none;
+  font-size: 2em;
+  -moz-transition: color 250ms;
+  -o-transition: color 250ms;
+  -webkit-transition: color 250ms;
+  transition: color 250ms;
+}
+/* line 88, ../scss/style.scss */
+#footer .social-links a:hover {
+  color: #d1d1d1;
+  -moz-transition: color 250ms;
+  -o-transition: color 250ms;
+  -webkit-transition: color 250ms;
+  transition: color 250ms;
+}
+
+/*=============================
+=            Panel            =
+=============================*/
+/* line 100, ../scss/style.scss */
+#content {
+  min-height: 100%;
+}
+
+/*=====================================
+=            Basic classes            =
+=====================================*/
+/* line 108, ../scss/style.scss */
+.basic-panel {
+  background: rgba(50, 50, 50, 0.85);
+  padding: 10px 20px;
+  width: 83%;
+  margin: 20px auto;
+  min-height: 100%;
+  overflow: hidden;
+  *zoom: 1;
+  -moz-box-shadow: 0 0 10px #404040;
+  -webkit-box-shadow: 0 0 10px #404040;
+  box-shadow: 0 0 10px #404040;
+}
+/* line 116, ../scss/style.scss */
+.basic-panel * {
+  color: #FAFAFA;
+}
+
+/* line 121, ../scss/style.scss */
+.basic-label {
+  display: inline-block;
+  margin: 0 10px;
+}
+
+/* line 126, ../scss/style.scss */
+.basic-select {
+  color: black;
+  padding: 7px 10px;
+  outline: none;
+  border: 2px solid #23b9fc;
+  -moz-border-radius: 2px;
+  -webkit-border-radius: 2px;
+  border-radius: 2px;
+}
+/* line 132, ../scss/style.scss */
+.basic-select option {
+  color: black;
+}
+/* line 135, ../scss/style.scss */
+.basic-select:disabled {
+  background: #6e6e6e;
+  color: #FAFAFA;
+  border-color: #545454;
+}
+
+/* line 142, ../scss/style.scss */
+.basic-button {
+  display: inline-block;
+  background: #03A9F4;
+  color: #FAFAFA;
+  font-weight: bold;
+  padding: 10px 15px;
+  border: none;
+  cursor: pointer;
+  -moz-box-shadow: 0 1px 5px #3b3b3b;
+  -webkit-box-shadow: 0 1px 5px #3b3b3b;
+  box-shadow: 0 1px 5px #3b3b3b;
+  -moz-transition: background 250ms, box-shadow 250ms;
+  -o-transition: background 250ms, box-shadow 250ms;
+  -webkit-transition: background 250ms, box-shadow 250ms;
+  transition: background 250ms, box-shadow 250ms;
+  -moz-border-radius: 2px;
+  -webkit-border-radius: 2px;
+  border-radius: 2px;
+}
+/* line 153, ../scss/style.scss */
+.basic-button:hover {
+  background: #0394d6;
+  -moz-transition: background 300ms, box-shadow 250ms;
+  -o-transition: background 300ms, box-shadow 250ms;
+  -webkit-transition: background 300ms, box-shadow 250ms;
+  transition: background 300ms, box-shadow 250ms;
+}
+/* line 157, ../scss/style.scss */
+.basic-button:focus {
+  outline: none;
+}
+/* line 160, ../scss/style.scss */
+.basic-button:active {
+  background: #038dcc;
+  outline: none;
+  -moz-transition: background 100ms, box-shadow 250ms;
+  -o-transition: background 100ms, box-shadow 250ms;
+  -webkit-transition: background 100ms, box-shadow 250ms;
+  transition: background 100ms, box-shadow 250ms;
+  -moz-box-shadow: 0 3px 12px #3b3b3b;
+  -webkit-box-shadow: 0 3px 12px #3b3b3b;
+  box-shadow: 0 3px 12px #3b3b3b;
+}
+/* line 166, ../scss/style.scss */
+.basic-button:disabled {
+  background: #6e6e6e;
+  cursor: default;
+}
+
+/* line 172, ../scss/style.scss */
+.basic-checkbox {
+  /* Coch├®e */
+  /* Aspect si "pas coch├®e" */
+  /* Aspect si "coch├®e" */
+  /* Aspect d├®sactiv├®e */
+  /* styles de la coche (si coch├®e/d├®sactiv├®e) */
+  /* on style aussi le label quand d├®sactiv├® */
+}
+/* line 173, ../scss/style.scss */
+.basic-checkbox [type="checkbox"]:not(:checked), .basic-checkbox [type="checkbox"]:checked {
+  position: absolute;
+  left: -9999px;
+}
+/* line 177, ../scss/style.scss */
+.basic-checkbox [type="checkbox"]:not(:checked) + label, .basic-checkbox [type="checkbox"]:checked + label {
+  position: relative;
+  /* permet de positionner les pseudo-├®l├®ments */
+  padding-left: 25px;
+  /* fait un peu d'espace pour notre case ├á venir */
+  cursor: pointer;
+  /* affiche un curseur adapt├® */
+}
+/* line 182, ../scss/style.scss */
+.basic-checkbox [type="checkbox"]:not(:checked) + label:before, .basic-checkbox [type="checkbox"]:checked + label:before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 2px;
+  width: 17px;
+  height: 17px;
+  border: 1px solid #ededed;
+  background: #FAFAFA;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  border-radius: 3px;
+  -moz-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+  -webkit-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+/* line 195, ../scss/style.scss */
+.basic-checkbox [type="checkbox"]:not(:checked) + label:after, .basic-checkbox [type="checkbox"]:checked + label:after {
+  content: '\e805';
+  font-family: 'fontello';
+  position: absolute;
+  top: 2px;
+  left: 3px;
+  font-size: 14px;
+  color: #03A9F4;
+  -moz-transition: all 200ms;
+  -o-transition: all 200ms;
+  -webkit-transition: all 200ms;
+  transition: all 200ms;
+}
+/* line 206, ../scss/style.scss */
+.basic-checkbox [type="checkbox"]:not(:checked) + label:after {
+  opacity: 0;
+  -moz-transform: scale(0);
+  -ms-transform: scale(0);
+  -webkit-transform: scale(0);
+  transform: scale(0);
+}
+/* line 211, ../scss/style.scss */
+.basic-checkbox [type="checkbox"]:checked + label:after {
+  opacity: 1;
+  -moz-transform: scale(1);
+  -ms-transform: scale(1);
+  -webkit-transform: scale(1);
+  transform: scale(1);
+}
+/* line 216, ../scss/style.scss */
+.basic-checkbox [type="checkbox"]:disabled:not(:checked) + label:before,
+.basic-checkbox [type="checkbox"]:disabled:checked + label:before {
+  box-shadow: none;
+  border-color: #bbb;
+  background-color: #ddd;
+}
+/* line 223, ../scss/style.scss */
+.basic-checkbox [type="checkbox"]:disabled:checked + label:after {
+  color: #999;
+}
+/* line 227, ../scss/style.scss */
+.basic-checkbox [type="checkbox"]:disabled + label {
+  color: #aaa;
+  cursor: default;
+}
+
+/* line 233, ../scss/style.scss */
+.row, .min-row {
+  width: 100%;
+  margin: 15px auto;
+  display: block;
+}
+
+/* line 239, ../scss/style.scss */
+.min-row {
+  width: 95% !important;
+}
+
+/*===================================
+=            Loading bar            =
+===================================*/
+/* line 248, ../scss/style.scss */
+.loadbar {
+  width: 95%;
+  margin: 5px auto;
+  background: #212121;
+  height: 5px;
+  position: relative;
+  -moz-border-radius: 10px;
+  -webkit-border-radius: 10px;
+  border-radius: 10px;
+}
+/* line 255, ../scss/style.scss */
+.loadbar .loader {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  width: 0px;
+  z-index: 10;
+  background: #4CAF50;
+  -moz-border-radius: 10px;
+  -webkit-border-radius: 10px;
+  border-radius: 10px;
+}
+
+/* line 268, ../scss/style.scss */
+.loadbar-info {
+  width: 90%;
+  margin: 0 auto;
+  text-align: center;
+  font-size: 0.65em;
+  font-style: italic;
+  min-height: 14px;
+}
+/* line 275, ../scss/style.scss */
+.loadbar-info a {
+  color: #03A9F4 !important;
+}
+
+/*=============================
+=            Login            =
+=============================*/
+/* line 285, ../scss/style.scss */
+.login .basic-checkbox {
+  margin-left: 10px;
+  display: inline-block;
+}
