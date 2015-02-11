@@ -352,10 +352,18 @@ a, a:visited {
   color: #03A9F4 !important;
 }
 
+/*==============================
+=            Labels            =
+==============================*/
+/* line 284, ../scss/style.scss */
+.label-error {
+  color: #F44336 !important;
+}
+
 /*=============================
 =            Login            =
 =============================*/
-/* line 285, ../scss/style.scss */
+/* line 293, ../scss/style.scss */
 .login .basic-checkbox {
   margin-left: 10px;
   display: inline-block;

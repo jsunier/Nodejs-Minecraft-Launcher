@@ -1,8 +1,15 @@
 jQuery(document).ready(function($) {
 	var gui = require('nw.gui');
 	var fs = require('fs');
+	var async = require('async');
 	var cache = require('memory-cache');
 	var path = require('path');
+	var Lang = require('mcms-node-localization');
+	var locales = ['fr','en']; //assuming you have 2 languages
+	var t = new Lang({
+	    directory : path.join(process.cwd(), 'js/locales'),
+	    locales : locales
+	}).add();
 	var Downloader = require(path.join(process.cwd(), 'js/downloader.js'));
 
 	var isWin = /^win/.test(process.platform);
@@ -16,45 +23,50 @@ jQuery(document).ready(function($) {
 	/*==========  Au démarrage du launcher  ==========*/
 	
 	window.onload = function() {
+		console.log('Démarrage du launcher | version : ' + gui.App.manifest.version);
 		disableInterface();
 		$('#main-background').animate({opacity: 1}, 1700);
-		printInfo("Chargement des dossiers d'installation...");
+		printInfo(t.get('info.versions'));
 
 		setInputFile(options.minecraft_folder, 'installation-folder');
 		setInputFile(options.minecraft_launcher, 'minecraft-launcher');
 
-		printInfo("Chargement des versions...");
 
 		var dwn = new Downloader({
-			gui: gui, 
+			version: gui.App.manifest.version, 
 			cache: cache,
 			minecraft_folder: options.minecraft_folder
 		});
 
-		var remote_versions = dwn.getVersions(function(versions) {
-			$('#version option').remove();
-			for(var version in versions.versions) {
-				if (versions.latest == version) {
-					$('#version').append('<option value="' + version + '" selected>' + version + '</option>');
-				}
-				else {
-					$('#version').append('<option value="' + version + '">' + version + '</option>');
-				}
-			}
-			printInfo("Vérification de la version du launcher...");
-			if(dwn.isUpToDate(versions)) {
-				printInfo('<a href="http://usinacraft.ch/serveur/launchers" class="external-link">Une nouvelle mise à jour du launcher est disponible!</a>');
-				/*var go_page = confirm('Une nouvelle version du launcher est disponible!\nCliquez sur "Ok" pour accèder à la page des téléchargements');
-				if (go_page) {
-					gui.Shell.openExternal('http://usinacraft.ch/serveur/launchers');
-				}*/
-			}
-			else {
-				printInfo("Le launcher est à jour");
-			}
-			enableInterface();
-			return versions;
-		});
+		try {
+			async.series([
+				function(callback) {
+					printInfo("Chargement des versions...");
+					dwn.getVersions(function(versions) {
+						$('#version option').remove();
+						for(var version in versions.versions) {
+							if (versions.latest == version) {
+								$('#version').append('<option value="' + version + '" selected>' + version + '</option>');
+							}
+							else {
+								$('#version').append('<option value="' + version + '">' + version + '</option>');
+							}
+						}
+						callback();						
+					});
+				},
+				function(callback) {
+					printInfo("Vérification de la version du launcher...");
+					callback();
+				},
+				dwn.isUpToDate,
+				dwn.getLocalHashes
+			]);
+		} catch(err) {
+			console.error(err);
+			printError('Erreur: ' + err.message);
+		}
+
 	}
 
 	/*==========  Démarrage du téléchargement  ==========*/
@@ -89,20 +101,15 @@ jQuery(document).ready(function($) {
 	}
 
 	function printInfo(text) {
-		$('#loadbar-info').html(text);
+		$('#loadbar-info').removeClass('label-error').html(text);
+	}
+
+	function printError(text) {
+		$('#loadbar-info').addClass('label-error').html(text);
 	}
 
 	function clearPrint() {
 		$('#loadbar-info').html('');
-	}
-
-	function setInputFile(folder, id) {
-		if (fs.existsSync(folder)) {
-			var f = new File(folder, '');
-			var files = new FileList();
-			files.append(f);
-			document.getElementById(id).files = files;
-		}
 	}
 
 	function setInputFile(folder, id) {
