@@ -33,6 +33,7 @@
     "is-version-newer": "~1.0.2",
     "memory-cache": "0.0.5",
     "async": "~0.9.0",
-    "mcms-node-localization": "0.0.3"
+    "mcms-node-localization": "0.0.3",
+    "ds-cache": "0.0.7"
   }
 }

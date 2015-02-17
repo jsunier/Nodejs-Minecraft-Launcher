@@ -2,15 +2,19 @@ jQuery(document).ready(function($) {
 	var gui = require('nw.gui');
 	var fs = require('fs');
 	var async = require('async');
-	var cache = require('memory-cache');
 	var path = require('path');
 	var Lang = require('mcms-node-localization');
+	var Downloader = require(path.join(process.cwd(), 'js/downloader.js'));
+	var Cache = require('ds-cache');
 	var locales = ['fr','en']; //assuming you have 2 languages
 	var t = new Lang({
 	    directory : path.join(process.cwd(), 'js/locales'),
 	    locales : locales
-	}).add();
-	var Downloader = require(path.join(process.cwd(), 'js/downloader.js'));
+	});
+	var cache = new Cache({
+		auto_save: true,
+		filename: 'data.json'
+	});
 
 	var isWin = /^win/.test(process.platform);
 	var user_folder = process.env[isWin ? 'USERPROFILE' : 'HOME'];
@@ -20,21 +24,25 @@ jQuery(document).ready(function($) {
 		minecraft_launcher: isWin ? user_folder + "/desktop/Minecraft.exe" : user_folder + "/desktop/Minecraft.jar"
 	};
 
+	t.add();
+
 	/*==========  Au démarrage du launcher  ==========*/
 	
 	window.onload = function() {
-		console.log('Démarrage du launcher | version : ' + gui.App.manifest.version);
 		disableInterface();
+		console.log('Démarrage du launcher | version : ' + gui.App.manifest.version);
 		$('#main-background').animate({opacity: 1}, 1700);
 		printInfo(t.get('info.versions'));
 
 		setInputFile(options.minecraft_folder, 'installation-folder');
 		setInputFile(options.minecraft_launcher, 'minecraft-launcher');
 
+		printInfo(t.get('info.load_cache'));
+
+		cache.load();
 
 		var dwn = new Downloader({
-			version: gui.App.manifest.version, 
-			cache: cache,
+			version: gui.App.manifest.version,
 			minecraft_folder: options.minecraft_folder
 		});
 
@@ -57,11 +65,18 @@ jQuery(document).ready(function($) {
 				},
 				function(callback) {
 					printInfo("Vérification de la version du launcher...");
-					callback();
+					dwn.isUpToDate(gui.App.manifest.version, callback);
 				},
-				dwn.isUpToDate,
-				dwn.getLocalHashes
-			]);
+				function(callback) {
+					printInfo("Récupération des MD5 local...");
+					dwn.getLocalHashes(callback);
+				}
+			], function(err, results) {
+				clearPrint();
+				cache.load();
+				console.log(cache.get('local_hash'));
+				enableInterface();
+			});
 		} catch(err) {
 			console.error(err);
 			printError('Erreur: ' + err.message);

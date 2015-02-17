@@ -1,4 +1,5 @@
 {
 	"server.name" : "Usinacraft",
-	"versions" : "Chargement des versions..."
+	"versions" : "Chargement des versions...",
+	"load_cache" : "Chargement du cache..."
 }

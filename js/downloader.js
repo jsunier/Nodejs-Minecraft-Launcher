@@ -7,12 +7,17 @@ var ivn = require('is-version-newer');
 var http = require('http');
 var fs = require('fs');
 var crypto = require('crypto');
+var async = require('async');
+var Cache = require('ds-cache');
 var base_url = "http://minecraft.usinacraft.ch/";
+var cache = new Cache({
+	auto_save: true,
+	filename: 'data.json'
+});
+cache.load();
 
 function Downloader(options) {
-	this.gui = options.gui;
 	this.minecraft_folder = options.minecraft_folder;
-	this.cache = options.cache;
 	this.files = {};
 }
 
@@ -21,7 +26,6 @@ function Downloader(options) {
  * @param  {Function} callback 
  */
 Downloader.prototype.getVersions = function(callback) {
-	var cache = this.cache;
 	http.get(base_url + "new_launcher/versions.json", function(res) {
 	    var body = '';
 
@@ -31,9 +35,8 @@ Downloader.prototype.getVersions = function(callback) {
 
 	    res.on('end', function() {
 	        var JSONResponse = JSON.parse(body);
-	        cache.put('remote_versions', JSONResponse);
+	        cache.set('remote_versions', JSONResponse);
 	        callback(JSONResponse);
-	        return JSONResponse;
 	    });
 	}).on('error', function(e) {
 	    console.error("Erreur lors du chargement des versions: ", e);
@@ -46,14 +49,12 @@ Downloader.prototype.getVersions = function(callback) {
  * @param  {Object}  versions JSON des versions (doit aussi contenir la version du launcher)
  * @return {Boolean}          true si une mise à jour est disponible et false si le launcher est à jour
  */
-Downloader.prototype.isUpToDate = function(callback) {
-	var local_version = this.version;
-	var versions = this.cache.get('remote_versions');
+Downloader.prototype.isUpToDate = function(local_version, callback) {
+	var versions = cache.get('remote_versions');
 	if (typeof versions == "undefined" || versions == null) {
 		console.error('Impossible de vérifier la version du launcher');
 	}
 	else {
-		console.log(versions);
 		if (ivn(local_version, versions.launcher)) {
 			console.log('Une nouvelle version du launcher est disponible');
 		} else {
@@ -67,33 +68,49 @@ Downloader.prototype.isUpToDate = function(callback) {
  * Récuperer les hashes du contenu de tout les fichiers en MD5
  * @return {[type]} [description]
  */
-Downloader.prototype.getLocalHashes = function(callback) {
-	var cache = this.cache;
+Downloader.prototype.getLocalHashes = function(main_callback) {
 	var minecraft_folder = this.minecraft_folder;
 	var data = this.files;
 	if (fs.existsSync(minecraft_folder)) {
-		fs.readdir(minecraft_folder + "/mods/",function(err,files){
+		fs.readdir(minecraft_folder + "/mods/", function(err,files){
 		    if (err) throw err;
-		    var c=0;
-		    files.forEach(function(file){
+		    async.each(files, function(file, callback) {
 		    	var dirfile = minecraft_folder + "/mods/" + file;
-		        c++;
 		        if (fs.lstatSync(dirfile).isFile()) {
 		        	var hash = getHash(dirfile, function(hash) {
 		        		data[file] = hash;
+		        		callback();
 		        	});
 			    }
+			    else {
+			    	callback();
+			    }
+		    }, function() {
+				cache.set('local_hash', data);
+				cache.save();
+				main_callback();
 		    });
 		});
-		this.cache.put('local_hash', data);
-		callback();
 	}
 	else {
-		throw "Le dossier d'installation n'existe pas";
+		console.log("Le dossier d'installation n'existe pas");
+		main_callback();
 	}
 }
 
 Downloader.prototype.getRemoteHashes = function() {
+
+}
+
+Downloader.prototype.getDifference = function() {
+
+}
+
+Downloader.prototype.countSize = function() {
+
+}
+
+Downloader.prototype.downloadFiles = function() {
 
 }
 
@@ -110,14 +127,6 @@ function getHash(file, callback) {
 
 	// read all file and pipe it (write it) to the hash object
 	fd.pipe(hash);
-}
-
-Downloader.prototype.countSize = function() {
-
-}
-
-Downloader.prototype.downloadFiles = function() {
-
 }
 
 module.exports = Downloader;
