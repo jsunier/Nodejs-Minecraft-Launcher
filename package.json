@@ -29,11 +29,13 @@
     }
   ],
   "dependencies": {
-    "dld": "0.0.2",
-    "is-version-newer": "~1.0.2",
-    "memory-cache": "0.0.5",
     "async": "~0.9.0",
+    "ds-cache": "0.0.7",
+    "fs-extra": "^0.16.4",
+    "is-version-newer": "~1.0.2",
+    "many-file-hashes": "^0.4.1",
     "mcms-node-localization": "0.0.3",
-    "ds-cache": "0.0.7"
+    "memory-cache": "0.0.5",
+    "node-curl-download": "0.0.2"
   }
 }
