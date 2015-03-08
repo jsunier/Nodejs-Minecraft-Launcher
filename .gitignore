@@ -1,3 +1,5 @@
-.sass-cache/
-node_modules/
+/.sass-cache/
+/node_modules/
 credits.html
+data.json
+/tmp/*

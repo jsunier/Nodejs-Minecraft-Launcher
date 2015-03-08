@@ -83,22 +83,6 @@ Downloader.prototype.getLocalHashes = function(main_callback) {
 			console.log("Le dossier d'installation existe!");
 			fs.readdir(minecraft_folder + "/mods", function(err,files){
 			    if (err) console.log(err);
-			    /*async.each(files, function(file, callback) {
-			    	var dirfile = minecraft_folder + "/mods/" + file;
-			        if (fs.lstatSync(dirfile).isFile()) {
-			        	var hash = getHash(dirfile, function(hash) {
-			        		data[file] = hash;
-			        		callback();
-			        	});
-				    }
-				    else {
-				    	callback();
-				    }
-			    }, function() {
-					cache.set('local_hash', data);
-					cache.save();
-					main_callback();
-			    });*/
 				var all_files = new Array();
 				async.each(files, function(file, callback) {
 					if (fs.lstatSync(minecraft_folder + "/mods/" + file).isFile()) {
@@ -167,8 +151,6 @@ Downloader.prototype.getDifference = function(callback) {
 	}
 
 	var difference = removeFolderHash(diffArray(remote_files, local_files));
-
-	console.log(difference);
 
 	cache.set('difference', difference);
 
