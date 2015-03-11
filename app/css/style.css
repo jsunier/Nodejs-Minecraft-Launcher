@@ -309,10 +309,372 @@ a, a:visited {
   width: 95% !important;
 }
 
+/*================================
+=            Tooltips            =
+================================*/
+/* line 383, ../scss/style.scss */
+.tooltip-holder {
+  text-align: center;
+  font-family: arial, helvetica, sans-serif;
+}
+
+/* line 389, ../scss/style.scss */
+.tooltip.ne {
+  position: relative;
+}
+/* line 304, ../scss/style.scss */
+.tooltip.ne:before, .tooltip.ne:after {
+  opacity: 0;
+  z-index: 98;
+  -moz-transition: opacity 300ms, visibility 0ms linear 300ms;
+  -o-transition: opacity 300ms, visibility 0ms linear 300ms;
+  -webkit-transition: opacity 300ms, visibility 0ms linear;
+  -webkit-transition-delay: 0s, 300ms;
+  transition: opacity 300ms, visibility 0ms linear 300ms;
+  pointer-events: none;
+}
+@media (max-width: 480px) {
+  /* line 304, ../scss/style.scss */
+  .tooltip.ne:before, .tooltip.ne:after {
+    display: none;
+  }
+}
+/* line 311, ../scss/style.scss */
+.tooltip.ne:before {
+  content: attr(data-tooltip);
+  position: absolute;
+  width: 230px;
+  padding: 10px 15px;
+  line-height: 18px;
+  text-align: left;
+  font-size: 13px;
+  font-weight: normal;
+  white-space: normal;
+  word-break: break-all;
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+  border-radius: 3px;
+  background-color: #0275a8;
+  color: #fff;
+}
+/* line 331, ../scss/style.scss */
+.tooltip.ne:after {
+  content: '';
+}
+/* line 335, ../scss/style.scss */
+.tooltip.ne:before {
+  top: -9px;
+  bottom: auto;
+  -moz-transform: translateY(-100%);
+  -ms-transform: translateY(-100%);
+  -webkit-transform: translateY(-100%);
+  transform: translateY(-100%);
+}
+/* line 339, ../scss/style.scss */
+.tooltip.ne:after {
+  content: '';
+  display: block;
+  position: absolute;
+  height: 0;
+  width: 0;
+  border-top: 6px solid #0275a8;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-bottom: none;
+  top: -9px;
+  bottom: auto;
+}
+/* line 357, ../scss/style.scss */
+.tooltip.ne:before, .tooltip.ne:after {
+  left: 50%;
+  right: auto;
+  margin-left: -6px;
+}
+/* line 361, ../scss/style.scss */
+.tooltip.ne:before {
+  margin-left: -18px;
+}
+/* line 373, ../scss/style.scss */
+.tooltip.ne:hover {
+  /* putting comment here so :hover is declared first by itself to fix ie10 bug with transitions on psuedo elements- http://css-tricks.com/pseudo-element-animationstransitions-bug-fixed-in-webkit/ */
+}
+/* line 375, ../scss/style.scss */
+.tooltip.ne:hover:before, .tooltip.ne:hover:after {
+  opacity: 1;
+  pointer-events: all;
+  -moz-transition-delay: 0ms;
+  -o-transition-delay: 0ms;
+  -webkit-transition-delay: 0ms;
+  transition-delay: 0ms;
+}
+/* line 390, ../scss/style.scss */
+.tooltip.nw {
+  position: relative;
+}
+/* line 304, ../scss/style.scss */
+.tooltip.nw:before, .tooltip.nw:after {
+  opacity: 0;
+  z-index: 98;
+  -moz-transition: opacity 300ms, visibility 0ms linear 300ms;
+  -o-transition: opacity 300ms, visibility 0ms linear 300ms;
+  -webkit-transition: opacity 300ms, visibility 0ms linear;
+  -webkit-transition-delay: 0s, 300ms;
+  transition: opacity 300ms, visibility 0ms linear 300ms;
+  pointer-events: none;
+}
+@media (max-width: 480px) {
+  /* line 304, ../scss/style.scss */
+  .tooltip.nw:before, .tooltip.nw:after {
+    display: none;
+  }
+}
+/* line 311, ../scss/style.scss */
+.tooltip.nw:before {
+  content: attr(data-tooltip);
+  position: absolute;
+  width: 230px;
+  padding: 10px 15px;
+  line-height: 18px;
+  text-align: left;
+  font-size: 13px;
+  font-weight: normal;
+  white-space: normal;
+  word-break: break-all;
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+  border-radius: 3px;
+  background-color: #0275a8;
+  color: #fff;
+}
+/* line 331, ../scss/style.scss */
+.tooltip.nw:after {
+  content: '';
+}
+/* line 335, ../scss/style.scss */
+.tooltip.nw:before {
+  top: -9px;
+  bottom: auto;
+  -moz-transform: translateY(-100%);
+  -ms-transform: translateY(-100%);
+  -webkit-transform: translateY(-100%);
+  transform: translateY(-100%);
+}
+/* line 339, ../scss/style.scss */
+.tooltip.nw:after {
+  content: '';
+  display: block;
+  position: absolute;
+  height: 0;
+  width: 0;
+  border-top: 6px solid #0275a8;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-bottom: none;
+  top: -9px;
+  bottom: auto;
+}
+/* line 364, ../scss/style.scss */
+.tooltip.nw:before, .tooltip.nw:after {
+  right: 50%;
+  left: auto;
+  margin-right: -6px;
+}
+/* line 368, ../scss/style.scss */
+.tooltip.nw:before {
+  margin-right: -18px;
+}
+/* line 373, ../scss/style.scss */
+.tooltip.nw:hover {
+  /* putting comment here so :hover is declared first by itself to fix ie10 bug with transitions on psuedo elements- http://css-tricks.com/pseudo-element-animationstransitions-bug-fixed-in-webkit/ */
+}
+/* line 375, ../scss/style.scss */
+.tooltip.nw:hover:before, .tooltip.nw:hover:after {
+  opacity: 1;
+  pointer-events: all;
+  -moz-transition-delay: 0ms;
+  -o-transition-delay: 0ms;
+  -webkit-transition-delay: 0ms;
+  transition-delay: 0ms;
+}
+/* line 391, ../scss/style.scss */
+.tooltip.se {
+  position: relative;
+}
+/* line 304, ../scss/style.scss */
+.tooltip.se:before, .tooltip.se:after {
+  opacity: 0;
+  z-index: 98;
+  -moz-transition: opacity 300ms, visibility 0ms linear 300ms;
+  -o-transition: opacity 300ms, visibility 0ms linear 300ms;
+  -webkit-transition: opacity 300ms, visibility 0ms linear;
+  -webkit-transition-delay: 0s, 300ms;
+  transition: opacity 300ms, visibility 0ms linear 300ms;
+  pointer-events: none;
+}
+@media (max-width: 480px) {
+  /* line 304, ../scss/style.scss */
+  .tooltip.se:before, .tooltip.se:after {
+    display: none;
+  }
+}
+/* line 311, ../scss/style.scss */
+.tooltip.se:before {
+  content: attr(data-tooltip);
+  position: absolute;
+  width: 230px;
+  padding: 10px 15px;
+  line-height: 18px;
+  text-align: left;
+  font-size: 13px;
+  font-weight: normal;
+  white-space: normal;
+  word-break: break-all;
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+  border-radius: 3px;
+  background-color: #0275a8;
+  color: #fff;
+}
+/* line 331, ../scss/style.scss */
+.tooltip.se:after {
+  content: '';
+}
+/* line 345, ../scss/style.scss */
+.tooltip.se:before {
+  bottom: -9px;
+  top: auto;
+  -moz-transform: translateY(100%);
+  -ms-transform: translateY(100%);
+  -webkit-transform: translateY(100%);
+  transform: translateY(100%);
+}
+/* line 349, ../scss/style.scss */
+.tooltip.se:after {
+  content: '';
+  display: block;
+  position: absolute;
+  height: 0;
+  width: 0;
+  border-bottom: 6px solid #0275a8;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: none;
+  bottom: -9px;
+  top: auto;
+}
+/* line 357, ../scss/style.scss */
+.tooltip.se:before, .tooltip.se:after {
+  left: 50%;
+  right: auto;
+  margin-left: -6px;
+}
+/* line 361, ../scss/style.scss */
+.tooltip.se:before {
+  margin-left: -18px;
+}
+/* line 373, ../scss/style.scss */
+.tooltip.se:hover {
+  /* putting comment here so :hover is declared first by itself to fix ie10 bug with transitions on psuedo elements- http://css-tricks.com/pseudo-element-animationstransitions-bug-fixed-in-webkit/ */
+}
+/* line 375, ../scss/style.scss */
+.tooltip.se:hover:before, .tooltip.se:hover:after {
+  opacity: 1;
+  pointer-events: all;
+  -moz-transition-delay: 0ms;
+  -o-transition-delay: 0ms;
+  -webkit-transition-delay: 0ms;
+  transition-delay: 0ms;
+}
+/* line 392, ../scss/style.scss */
+.tooltip.sw {
+  position: relative;
+}
+/* line 304, ../scss/style.scss */
+.tooltip.sw:before, .tooltip.sw:after {
+  opacity: 0;
+  z-index: 98;
+  -moz-transition: opacity 300ms, visibility 0ms linear 300ms;
+  -o-transition: opacity 300ms, visibility 0ms linear 300ms;
+  -webkit-transition: opacity 300ms, visibility 0ms linear;
+  -webkit-transition-delay: 0s, 300ms;
+  transition: opacity 300ms, visibility 0ms linear 300ms;
+  pointer-events: none;
+}
+@media (max-width: 480px) {
+  /* line 304, ../scss/style.scss */
+  .tooltip.sw:before, .tooltip.sw:after {
+    display: none;
+  }
+}
+/* line 311, ../scss/style.scss */
+.tooltip.sw:before {
+  content: attr(data-tooltip);
+  position: absolute;
+  width: 230px;
+  padding: 10px 15px;
+  line-height: 18px;
+  text-align: left;
+  font-size: 13px;
+  font-weight: normal;
+  white-space: normal;
+  word-break: break-all;
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+  border-radius: 3px;
+  background-color: #0275a8;
+  color: #fff;
+}
+/* line 331, ../scss/style.scss */
+.tooltip.sw:after {
+  content: '';
+}
+/* line 345, ../scss/style.scss */
+.tooltip.sw:before {
+  bottom: -9px;
+  top: auto;
+  -moz-transform: translateY(100%);
+  -ms-transform: translateY(100%);
+  -webkit-transform: translateY(100%);
+  transform: translateY(100%);
+}
+/* line 349, ../scss/style.scss */
+.tooltip.sw:after {
+  content: '';
+  display: block;
+  position: absolute;
+  height: 0;
+  width: 0;
+  border-bottom: 6px solid #0275a8;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: none;
+  bottom: -9px;
+  top: auto;
+}
+/* line 364, ../scss/style.scss */
+.tooltip.sw:before, .tooltip.sw:after {
+  right: 50%;
+  left: auto;
+  margin-right: -6px;
+}
+/* line 368, ../scss/style.scss */
+.tooltip.sw:before {
+  margin-right: -18px;
+}
+/* line 373, ../scss/style.scss */
+.tooltip.sw:hover {
+  /* putting comment here so :hover is declared first by itself to fix ie10 bug with transitions on psuedo elements- http://css-tricks.com/pseudo-element-animationstransitions-bug-fixed-in-webkit/ */
+}
+/* line 375, ../scss/style.scss */
+.tooltip.sw:hover:before, .tooltip.sw:hover:after {
+  opacity: 1;
+  pointer-events: all;
+  -moz-transition-delay: 0ms;
+  -o-transition-delay: 0ms;
+  -webkit-transition-delay: 0ms;
+  transition-delay: 0ms;
+}
+
 /*===================================
 =            Loading bar            =
 ===================================*/
-/* line 248, ../scss/style.scss */
+/* line 399, ../scss/style.scss */
 .loadbar {
   width: 95%;
   margin: 5px auto;
@@ -323,7 +685,7 @@ a, a:visited {
   -webkit-border-radius: 10px;
   border-radius: 10px;
 }
-/* line 255, ../scss/style.scss */
+/* line 406, ../scss/style.scss */
 .loadbar .loader {
   position: absolute;
   top: 0;
@@ -338,7 +700,7 @@ a, a:visited {
   border-radius: 10px;
 }
 
-/* line 268, ../scss/style.scss */
+/* line 419, ../scss/style.scss */
 .loadbar-info {
   width: 90%;
   margin: 0 auto;
@@ -347,7 +709,7 @@ a, a:visited {
   font-style: italic;
   min-height: 14px;
 }
-/* line 275, ../scss/style.scss */
+/* line 426, ../scss/style.scss */
 .loadbar-info a {
   color: #03A9F4 !important;
 }
@@ -355,7 +717,7 @@ a, a:visited {
 /*==============================
 =            Labels            =
 ==============================*/
-/* line 284, ../scss/style.scss */
+/* line 435, ../scss/style.scss */
 .label-error {
   color: #F44336 !important;
 }
@@ -363,7 +725,7 @@ a, a:visited {
 /*=============================
 =            Login            =
 =============================*/
-/* line 293, ../scss/style.scss */
+/* line 444, ../scss/style.scss */
 .login .basic-checkbox {
   margin-left: 10px;
   display: inline-block;

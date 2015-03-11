@@ -8,3 +8,9 @@ $basic_green: #4CAF50;
 $basic_white: #FAFAFA;
 $basic_black: #212121;
 $disabled_color: lighten($basic_black, 30%);
+
+$smartphone: 480px;
+$tabletPortrait: 767px;
+$tabletLandscape: 1024px;
+$desktop: 1174px;
+$largeScreen: 1400px;

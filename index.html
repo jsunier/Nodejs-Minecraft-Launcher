@@ -47,8 +47,14 @@
 						</div>
 					</div>
 					<div class="min-row installs">
-						<p>Dossier d'installation : <input type="file" webkitdirectory class="basic-button" id="installation-folder" value="Dossier d'installation"></p>
-						<p title="Launcher à lancer après l'installation d'Usinacraft">Launcher Minecraft : <input type="file" class="basic-button" id="minecraft-launcher" accept=".exe"></p>
+						<p>Dossier d'installation (.minecraft): 
+							<button class="basic-button fake-file tooltip ne" data-tooltip="Aucun dossier sélectionné" type="button">Choisir le dossier d'installation</button>
+							<input type="file" webkitdirectory id="installation-folder" value="Dossier d'installation" style="display:none;">
+						</p>
+						<p title="Launcher à lancer après l'installation d'Usinacraft">Launcher Minecraft : 
+							<button class="basic-button fake-file tooltip ne" data-tooltip="Aucun launcher sélectionné">Choisir le launcher Minecraft</button>
+							<input type="file" id="minecraft-launcher" accept=".exe" style="display:none;">
+						</p>
 					</div>
 				</form>
 			</div>

@@ -2,7 +2,7 @@
   "name": "usinacraft-launcher",
   "main": "index.html",
   "description": "Launcher officiel d'Usinacraft",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "keywords": [
     "usinacraft",
     "minecraft",
@@ -12,7 +12,7 @@
   ],
   "window": {
     "title": "Usinacraft - Launcher - Alpha 2.0",
-    "icon": "css/images/favicon.png",
+    "icon": "app/css/images/favicon.png",
     "toolbar": true,
     "resizable": false,
     "width": 800,
