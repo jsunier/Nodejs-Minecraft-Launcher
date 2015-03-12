@@ -5,6 +5,7 @@ jQuery(document).ready(function($) {
 	var path = require('path');
 	var Lang = require('mcms-node-localization');
 	var Downloader = require(path.join(process.cwd(), 'scripts/downloader.js'));
+	var Logger = require(path.join(process.cwd(), 'scripts/logger.js'));
 	var Cache = require('ds-cache');
 	var locales = ['fr','en']; //assuming you have 2 languages
 	var t = new Lang({
@@ -20,15 +21,20 @@ jQuery(document).ready(function($) {
 	var user_folder = process.env[isWin ? 'USERPROFILE' : 'HOME'];
 	var options = {
 		version: gui.App.manifest.version.toString(),
-		minecraft_folder: isWin ? user_folder + "/AppData/Roaming/.minecraft" : user_folder + "/.minecraft",
-		minecraft_launcher: isWin ? user_folder + "/desktop/Minecraft.exe" : user_folder + "/desktop/Minecraft.jar"
+		minecraft_folder: cache.get('minecraft_folder') && fs.existsSync(cache.get('minecraft_folder')) ? cache.get('minecraft_folder') : isWin ? user_folder + "/AppData/Roaming/.minecraft" : user_folder + "/.minecraft",
+		minecraft_launcher: cache.get('minecraft_launcher') && fs.existsSync(cache.get('minecraft_folder')) ? cache.get('minecraft_launcher') : isWin ? user_folder + "/desktop/Minecraft.exe" : user_folder + "/desktop/Minecraft.jar"
 	};
 
 	t.add(); // Initialisation des langues
+	window.printInfo = printInfo;
+	window.printError = printError;
+	window.clearPrint = clearPrint;
+	Logger = new Logger();
 
 	process.on('uncaughtException', function (err) {
 	  console.log(err);
-	})
+	});
+
 
 	/*==========  Au démarrage du launcher  ==========*/
 	
@@ -50,8 +56,7 @@ jQuery(document).ready(function($) {
 		async.series([
 			function(callback) {
 				if(gui.App.argv.indexOf("--reset") > -1) {
-					printInfo("Nettoyage du cache de l'application...");
-					console.log("Nettoyage de l'application");
+					Logger.info("Nettoyage du cache de l'application...");
 					cache.clear();
 					gui.App.clearCache();
 					rmdirAsync('tmp', function() {
@@ -61,7 +66,7 @@ jQuery(document).ready(function($) {
 				else callback();
 			},
 			function(callback) {
-				printInfo("Chargement des versions...");
+				Logger.info("Chargement des versions...");
 				cache.set('launcher_version', options.version);
 				dwn.getVersions(function(versions) {
 					$('#version option').remove();
@@ -77,7 +82,7 @@ jQuery(document).ready(function($) {
 				});
 			},
 			function(callback) {
-				printInfo("Vérification de la version du launcher...");
+				Logger.info("Vérification de la version du launcher...");
 				dwn.isUpToDate(options.version, callback);
 			}
 		], function(err, results) {
@@ -86,8 +91,7 @@ jQuery(document).ready(function($) {
 			enableInterface();
 		});
 	} catch(err) {
-		console.error(err);
-		printError('Erreur: ' + err.message);
+		Logger.error("Erreur: " + err.message, err);
 	}
 
 
@@ -96,6 +100,7 @@ jQuery(document).ready(function($) {
 	$('#main-version').submit(function(event) {
 		cache.load();
 		event.preventDefault();
+		disableInterface();
 		var install_folder = $('#installation-folder').val();
 		var minecraft_launcher = $('#minecraft-launcher').val();
 		var selected_version = $('#version').val();
@@ -104,38 +109,37 @@ jQuery(document).ready(function($) {
 		cache.set('selected_version', selected_version);
 		cache.set('minecraft_folder', install_folder);
 		cache.set('minecraft_launcher', minecraft_launcher);
-		printInfo("Préparation du téléchargement...");
-		disableInterface();
+		Logger.info("Préparation du téléchargement...");
 		
 		try {
 			async.series([
 				function(callback) {
-					printInfo("Récupération des MD5 locaux...");
+					Logger.info("Récupération des MD5 locaux...");
 					dwn.getLocalHashes(callback);
 				},
 				function(callback) {
-					printInfo("Récupération des MD5 distants...");
+					Logger.info("Récupération des MD5 distants...");
 					dwn.getRemoteHashes(callback);
 				},
 				function(callback) {
-					printInfo("Calcul des différences entre les fichiers locaux et distants...");
+					Logger.info("Calcul des différences entre les fichiers locaux et distants...");
 					dwn.getDifference(callback);
 				},
 				function(callback) {
 					if (force_update) {
-						printInfo("Suppression des mods pour le force udpate...");
+						Logger.info("Suppression des mods pour le force udpate...");
 						dwn.deleteFolders(callback);
 					}
 					else callback();
 				},
 				function(callback) {
-					printInfo("Suppression des vieux mods...");
+					Logger.info("Suppression des vieux mods...");
 					dwn.deleteOldFiles(callback);
 				},
 				function(callback) {
 					cache.load();
 					if (cache.get('difference').length > 0 || force_update) {
-						printInfo('Téléchargement des mods en cours...');
+						Logger.info('Téléchargement des mods en cours...');
 						dwn.downloadFiles(force_update, callback);
 					}
 					else callback();
@@ -143,19 +147,18 @@ jQuery(document).ready(function($) {
 				function(callback) {
 					cache.load();
 					if (cache.get('refresh_configs') == true || force_update) {
-						printInfo("Téléchargement des configurations...");
+						Logger.info("Téléchargement des configurations...");
 						dwn.downloadConfigs(callback);	
 					}
 					else callback();
 				},
 				function(callback) {
 					if (reset_profile) {
-						console.log("Remise à zéro du profil dans le launcher...");
+						Logger.info("Remise à zéro du profil dans le launcher...");
 						var profiles_file = cache.get('minecraft_folder') + "/launcher_profiles.json";
 						fs.readJson(profiles_file, function(err, data) {
 							if (err) {
-								console.log(err);
-								printError(err);
+								Logger.error("Erreur lors de la remise à zéro du profil: ", err);
 								callback();
 							}
 							else {
@@ -170,7 +173,7 @@ jQuery(document).ready(function($) {
 
 								fs.writeJson(profiles_file, data, function(err) {
 									if (err) console.log(err);
-									console.log("Remise à zéro du profil terminée.");
+									Logger.info("Remise à zéro du profil terminée.");
 									callback();
 								});
 							}
@@ -183,13 +186,11 @@ jQuery(document).ready(function($) {
 					console.log(err);
 					enableInterface();
 				}
-				printInfo("Téléchargement terminé!");
-				console.log('Terminé!');
+				Logger.info("Téléchargement terminé!");
 				launchMinecraft();
 			});
 		} catch(err) {
-			console.error(err);
-			printError('Erreur: ' + err.message);
+			Logger.error('Erreur: ' + err.message);
 		}
 	});
 
@@ -201,6 +202,7 @@ jQuery(document).ready(function($) {
 	$('input[type=file]').on('change', function(event) {
 		event.preventDefault();
 		$(this).prev().attr('data-tooltip', $(this).val());
+		enableInterface();
 	});
 
 	$('body').on('click', '.external-link', function(event) {
@@ -208,10 +210,11 @@ jQuery(document).ready(function($) {
 		gui.Shell.openExternal($(this).attr('href'));
 	});
 
+	/*==========  Main functions  ==========*/
+
 	function launchMinecraft() {
 		cache.load();
-		printInfo("Lancement du launcher en cours...");
-		console.log("Lancement du launcher Minecraft!");
+		Logger.info("Lancement du launcher en cours...");
 		setTimeout(function() {
 			require('child_process').exec(cache.get('minecraft_launcher')).unref();
 			setTimeout(function() {
@@ -229,7 +232,8 @@ jQuery(document).ready(function($) {
 	function enableInterface() {
 		$('.basic-form input').prop('disabled', false);
 		$('.basic-form select').prop('disabled', false);
-		if(ready()) $('.basic-form button').prop('disabled', false);
+		$('.basic-form button').not('#connection').prop('disabled', false);
+		if(ready()) $('.basic-form #connection').prop('disabled', false);
 	}
 
 	function printInfo(text) {
@@ -305,8 +309,4 @@ jQuery(document).ready(function($) {
 			});
 		});
 	}
-
-	window.printInfo = printInfo;
-	window.printError = printError;
-	window.clearPrint = clearPrint;
 });
