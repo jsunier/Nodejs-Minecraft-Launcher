@@ -1,4 +1,10 @@
 jQuery(document).ready(function($) {
+	/*===========================================
+	=            Usinacraft Launcher            =
+	===========================================*/
+
+	/*==========  Initialisation des modules  ==========*/
+	
 	var gui = require('nw.gui');
 	var fs = require('fs-extra');
 	var async = require('async');
@@ -8,6 +14,7 @@ jQuery(document).ready(function($) {
 	var Logger = require(path.join(process.cwd(), 'scripts/logger.js'));
 	var Cache = require('ds-cache');
 	var locales = ['fr','en']; //assuming you have 2 languages
+	// Définition des langues
 	var t = new Lang({
 	    directory : path.join(process.cwd(), 'app/locales'),
 	    locales : locales
@@ -17,40 +24,54 @@ jQuery(document).ready(function($) {
 		filename: 'data.json'
 	});
 
+	/*==========  Détection du système d'exploitation  ==========*/
+	
 	var isWin = /^win/.test(process.platform);
 	var user_folder = process.env[isWin ? 'USERPROFILE' : 'HOME'];
 	var options = {
 		version: gui.App.manifest.version.toString(),
 		minecraft_folder: cache.get('minecraft_folder') && fs.existsSync(cache.get('minecraft_folder')) ? cache.get('minecraft_folder') : isWin ? user_folder + "/AppData/Roaming/.minecraft" : user_folder + "/.minecraft",
-		minecraft_launcher: cache.get('minecraft_launcher') && fs.existsSync(cache.get('minecraft_folder')) ? cache.get('minecraft_launcher') : isWin ? user_folder + "/desktop/Minecraft.exe" : user_folder + "/desktop/Minecraft.jar"
+		minecraft_launcher: cache.get('minecraft_launcher') && fs.existsSync(cache.get('minecraft_folder')) ? cache.get('minecraft_launcher') : isWin ? user_folder + "/desktop/Minecraft.exe" : user_folder + "/desktop/Minecraft.jar",
+		title: " - BETA v" + gui.App.manifest.version.toString()
 	};
 
 	t.add(); // Initialisation des langues
+
+	/*==========  Ajout des fonctions principales à "window"  ==========*/
+	
 	window.printInfo = printInfo;
 	window.printError = printError;
 	window.clearPrint = clearPrint;
 	Logger = new Logger();
 
+	/*==========  Protection contre les "gros" crash  ==========*/
+
 	process.on('uncaughtException', function (err) {
 	  console.log(err);
 	});
-
 
 	/*==========  Au démarrage du launcher  ==========*/
 	
 	disableInterface();
 	console.log('Démarrage du launcher | version : ' + options.version);
+	$('title').append(options.title);
 	$('#main-background').animate({opacity: 1}, 1700); // Animation du background
 	printInfo(t.get('info.versions'));
 
+	/*==========  Application des valeurs aux champs de type "file"  ==========*/
+	
 	setInputFile(options.minecraft_folder, 'installation-folder');
 	setInputFile(options.minecraft_launcher, 'minecraft-launcher');
 
 	printInfo(t.get('info.load_cache'));
 
+	/*==========  Définition du système de téléchargement  ==========*/
+	
 	var dwn = new Downloader({
 		minecraft_folder: options.minecraft_folder
 	});
+
+	/*==========  Démarrage des tâches  ==========*/
 
 	try {
 		async.series([
@@ -94,7 +115,6 @@ jQuery(document).ready(function($) {
 		Logger.error("Erreur: " + err.message, err);
 	}
 
-
 	/*==========  Démarrage du téléchargement  ==========*/
 
 	$('#main-version').submit(function(event) {
@@ -110,7 +130,7 @@ jQuery(document).ready(function($) {
 		cache.set('minecraft_folder', install_folder);
 		cache.set('minecraft_launcher', minecraft_launcher);
 		Logger.info("Préparation du téléchargement...");
-		
+
 		try {
 			async.series([
 				function(callback) {
@@ -137,6 +157,10 @@ jQuery(document).ready(function($) {
 					dwn.deleteOldFiles(callback);
 				},
 				function(callback) {
+					Logger.info('Téléchargement des fichiers de base en cours...');
+					dwn.downloadBase(callback);
+				},
+				function(callback) {
 					cache.load();
 					if (cache.get('difference').length > 0 || force_update) {
 						Logger.info('Téléchargement des mods en cours...');
@@ -153,7 +177,7 @@ jQuery(document).ready(function($) {
 					else callback();
 				},
 				function(callback) {
-					if (reset_profile) {
+					if (reset_profile) { // Configuration du profile (si l'utilisateur à coché la case "Réinitialiser le profil")
 						Logger.info("Remise à zéro du profil dans le launcher...");
 						var profiles_file = cache.get('minecraft_folder') + "/launcher_profiles.json";
 						fs.readJson(profiles_file, function(err, data) {
@@ -186,13 +210,15 @@ jQuery(document).ready(function($) {
 					console.log(err);
 					enableInterface();
 				}
-				Logger.info("Téléchargement terminé!");
+				Logger.info("Téléchargement et installation terminés!");
 				launchMinecraft();
 			});
 		} catch(err) {
 			Logger.error('Erreur: ' + err.message);
 		}
 	});
+
+	/*==========  Actions sur la page  ==========*/
 
 	$('.fake-file').on('click', function(event) {
 		event.preventDefault();
@@ -220,15 +246,21 @@ jQuery(document).ready(function($) {
 			setTimeout(function() {
 				gui.App.quit();
 			}, 2000);
-		}, 1000);
+		}, 500);
 	}
 
+	/**
+	 * Désactive tout les boutons de l'interface
+	 */
 	function disableInterface() {
 		$('.basic-form input').prop('disabled', true);
 		$('.basic-form select').prop('disabled', true);
 		$('.basic-form button').prop('disabled', true);
 	}
 
+	/**
+	 * Active tout les boutons de l'interface
+	 */
 	function enableInterface() {
 		$('.basic-form input').prop('disabled', false);
 		$('.basic-form select').prop('disabled', false);
@@ -236,6 +268,10 @@ jQuery(document).ready(function($) {
 		if(ready()) $('.basic-form #connection').prop('disabled', false);
 	}
 
+	/*===================================================
+	=            Fonctions intégrés à Logger            =
+	===================================================*/
+	
 	function printInfo(text) {
 		$('#loadbar-info').removeClass('label-error').html(text);
 	}
@@ -248,6 +284,8 @@ jQuery(document).ready(function($) {
 		$('#loadbar-info').html('');
 	}
 
+	/*-----  End of Fonctions intégrés à Logger  ------*/
+
 	function setInputFile(folder, id) {
 		if (fs.existsSync(folder)) {
 			var f = new File(folder, '');
@@ -258,6 +296,10 @@ jQuery(document).ready(function($) {
 		}
 	}
 
+	/**
+	 * Vérifie si le launcher est prêt pour le téléchargement
+	 * @return {Boolean} true : si le launcher est prêt, false : si le launcher n'est pas prêt
+	 */
 	function ready() {
 		if($("#installation-folder").val() == "" || $('#minecraft-launcher').val() == "") {
 			$('#connection').attr('disabled', 'disabled');
@@ -269,6 +311,11 @@ jQuery(document).ready(function($) {
 		}
 	}
 
+	/**
+	 * Supprimer un dossier de manière "recursive", tout les fichiers/sous-dossiers sont supprimés
+	 * @param  {String}   path     Chemin d'accès au dossier
+	 * @param  {Function} callback 
+	 */
 	function rmdirAsync(path, callback) {
 		fs.readdir(path, function(err, files) {
 			if(err) {
