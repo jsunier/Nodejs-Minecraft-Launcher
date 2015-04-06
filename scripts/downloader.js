@@ -71,7 +71,7 @@ Downloader.prototype.isUpToDate = function(local_version, callback) {
 	else {
 		if (ivn(local_version, remote_versions.launcher)) {
 			Logger.info("Une nouvelle version du launcher est disponible!");
-
+			window.doUpdate();
 		} else {
 		  	Logger.info("Le launcher est à jour");
 		}
