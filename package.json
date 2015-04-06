@@ -32,7 +32,7 @@
     "show_in_taskbar": true,
     "mac_icon": "app\\css\\images\\favicon.png",
     "width": 800,
-    "toolbar": false,
+    "toolbar": true,
     "icon": "app/css/images/favicon.png"
   },
   "js-flags": "",
@@ -53,13 +53,16 @@
   "version": "2.0.2",
   "snapshot": "",
   "dependencies": {
+    "asap": "^2.0.1",
     "async": "~0.9.0",
     "ds-cache": "0.0.7",
-    "fs-extra": "^0.16.4",
-    "is-version-newer": "~1.0.2",
+    "fs-extra": "^0.18.0",
+    "glob": "^5.0.3",
+    "is-version-newer": "^2.1.0",
+    "lodash": "^3.6.0",
     "many-file-hashes": "^0.4.1",
     "mcms-node-localization": "0.0.3",
-    "memory-cache": "0.0.5",
+    "memory-cache": "^0.1.2",
     "moment": "^2.9.0",
     "node-curl-download": "0.0.2"
   },
