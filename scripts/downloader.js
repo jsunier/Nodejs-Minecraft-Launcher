@@ -13,7 +13,7 @@ var manyHashes = require('many-file-hashes');
 var Logger = require('./logger.js');
 var cache = new Cache({
 	auto_save: true,
-	filename: 'data.json'
+	filename: 'cache.json'
 });
 cache.load();
 
@@ -29,7 +29,7 @@ function Downloader(options) {
 	else
 		this.minecraft_folder = options.minecraft_folder + "/";
 	this.remove_folders = options.remove_folders || ["mods", "config"];
-	this.base_url = options.base_url || "http://minecraft.usinacraft.ch/";
+	this.base_url = options.base_url || "http://files.usinacraft.ch/";
 }
 
 /**
@@ -38,7 +38,7 @@ function Downloader(options) {
  */
 Downloader.prototype.getVersions = function(callback) {
 	cache.load();
-	http.get(this.base_url + "new_launcher/versions.json", function(res) {
+	http.get(this.base_url + "launcher/versions.json", function(res) {
 	    var body = '';
 
 	    res.on('data', function(chunk) {
@@ -71,6 +71,7 @@ Downloader.prototype.isUpToDate = function(local_version, callback) {
 	else {
 		if (ivn(local_version, remote_versions.launcher)) {
 			Logger.info("Une nouvelle version du launcher est disponible!");
+
 		} else {
 		  	Logger.info("Le launcher est à jour");
 		}
@@ -213,21 +214,36 @@ Downloader.prototype.getDifference = function(callback) {
 
 /**
  * Suppression des dossiers lors d'un "force update" ou lors du premier téléchargement
- * @param  {Function} callback
+ * @param  {Function} main_callback
  */
-Downloader.prototype.deleteFolders = function(callback) {
+Downloader.prototype.deleteFolders = function(main_callback) {
 	cache.load();
 	var minecraft_folder = this.minecraft_folder, dest = null;
 	async.eachSeries(this.remove_folders, function(folder, callback) {
 		dest = minecraft_folder + folder;
-		if (fs.existsSync(dest) || fs.lstatSync(dest).isDirectory()) {
-			rmdirAsync(dest, function() {
+		fs.exists(dest, function(exist) {
+			if(!exist) {
+				Logger.info("Les dossiers à supprimer n'existe pas");
 				callback();
-			});
-		}
-		else callback();
+			}
+			if (fs.lstatSync(dest).isDirectory()) {
+				rmdirAsync(dest, function() {
+					callback();
+				});
+			}
+			else {
+				fs.unlink(dest, function(err) {
+					if(err) {
+						Logger.error(err);
+						callback();
+					}
+					callback();
+				});
+			}
+		});
 	}, function(err) {
 		Logger.info("Suppression des dossiers terminée");
+		main_callback();
 	});
 }
 

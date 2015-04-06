@@ -2,8 +2,8 @@
 =            Logger            =
 ==============================*/
 
-function Logger() {
-
+function Logger(options) {
+	this.file = options.file || "usinacraft.log";
 }
 
 /**
