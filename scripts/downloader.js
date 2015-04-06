@@ -24,12 +24,19 @@ Logger = new Logger(); // Information Logger
  * @param {Object} options Configurations principales
  */
 function Downloader(options) {
-	if(endsWith(options.minecraft_folder, '/'))
-		this.minecraft_folder = options.minecraft_folder;
-	else
-		this.minecraft_folder = options.minecraft_folder + "/";
-	this.remove_folders = options.remove_folders || ["mods", "config"];
-	this.base_url = options.base_url || "http://files.usinacraft.ch/";
+	var default_args = {
+		'minecraft_folder':	".minecraft",
+		'remove_folders':	["mods", "config"],
+		'base_url':	"http://files.usinacraft.ch/"
+	}
+
+	for(var index in default_args) {
+		if(typeof options[index] == "undefined") options[index] = default_args[index];
+	}
+
+	for(var i in options) {
+		this[i] = options[i];
+	}
 }
 
 /**
@@ -226,20 +233,13 @@ Downloader.prototype.deleteFolders = function(main_callback) {
 				Logger.info("Les dossiers à supprimer n'existe pas");
 				callback();
 			}
-			if (fs.lstatSync(dest).isDirectory()) {
-				rmdirAsync(dest, function() {
+			fs.remove(dest, function(err) {
+				if(err) {
+					Logger.error(err);
 					callback();
-				});
-			}
-			else {
-				fs.unlink(dest, function(err) {
-					if(err) {
-						Logger.error(err);
-						callback();
-					}
-					callback();
-				});
-			}
+				}
+				callback();
+			});
 		});
 	}, function(err) {
 		Logger.info("Suppression des dossiers terminée");
@@ -308,6 +308,7 @@ Downloader.prototype.downloadFiles = function(force_update, main_callback) {
 	var remote_files = cache.get('remote_hash');
 	var difference = cache.get('difference');
 	var download_list = new Array();
+	var base_url = this.base_url;
 
 	if (!fs.existsSync(minecraft_folder + "config") || ivn(mods_version, last_version.versions[selected_version]) || force_update)
 		cache.set('refresh_configs', true);
@@ -328,7 +329,7 @@ Downloader.prototype.downloadFiles = function(force_update, main_callback) {
 
 	async.eachSeries(download_list, function(file, callback) {
 		if (!endsWith(file, '/')) {
-			var url = this.base_url + 'ressources/' + selected_version + "/" + file;
+			var url = base_url + 'ressources/' + selected_version + "/" + file;
 			var dest = minecraft_folder + file;
 			Logger.info("Téléchargement de: " + file);
 			downloadFile(dest, url, callback);
@@ -354,6 +355,7 @@ Downloader.prototype.downloadConfigs = function(main_callback) {
 	var minecraft_folder = this.minecraft_folder;
 	var selected_version = cache.get('selected_version');
 	var remote_files = cache.get('remote_hash');
+	var base_url = this.base_url;
 
 	for(var file in remote_files.files.config) {
 		var file = remote_files.files.config[file];
@@ -369,7 +371,7 @@ Downloader.prototype.downloadConfigs = function(main_callback) {
 
 	async.eachSeries(download_list, function(file, callback) {
 		if (!endsWith(file, '/')) {
-			var url = this.base_url + 'ressources/' + selected_version + "/" + file;
+			var url = base_url + 'ressources/' + selected_version + "/" + file;
 			var dest = minecraft_folder + file;
 			Logger.info("Téléchargement de: " + file);
 			downloadFile(dest, url, callback);
@@ -399,7 +401,7 @@ function downloadFile(dest, url, callback) {
 			Logger.error(err);
 			callback();
 		}
-		var stream = fs.createWriteStream(dest);
+		var stream = fs.createOutputStream(dest);
         var loader = window.document.getElementById('loader');
         
 		try {
