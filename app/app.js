@@ -21,7 +21,7 @@ jQuery(document).ready(function($) {
 	});
 	var cache = new Cache({
 		auto_save: true,
-		filename: 'data.json'
+		filename: 'cache.json'
 	});
 
 	/*==========  Détection du système d'exploitation  ==========*/
@@ -32,7 +32,8 @@ jQuery(document).ready(function($) {
 		version: gui.App.manifest.version.toString(),
 		minecraft_folder: cache.get('minecraft_folder') && fs.existsSync(cache.get('minecraft_folder')) ? cache.get('minecraft_folder') : isWin ? user_folder + "/AppData/Roaming/.minecraft" : user_folder + "/.minecraft",
 		minecraft_launcher: cache.get('minecraft_launcher') && fs.existsSync(cache.get('minecraft_folder')) ? cache.get('minecraft_launcher') : isWin ? user_folder + "/desktop/Minecraft.exe" : user_folder + "/desktop/Minecraft.jar",
-		title: " - BETA v" + gui.App.manifest.version.toString()
+		title: " - BETA v" + gui.App.manifest.version.toString(),
+		update_link: "http://new.usinacraft.ch/server/launcher"
 	};
 
 	t.add(); // Initialisation des langues
@@ -42,6 +43,7 @@ jQuery(document).ready(function($) {
 	window.printInfo = printInfo;
 	window.printError = printError;
 	window.clearPrint = clearPrint;
+	window.doUpdate = doUpdate;
 	Logger = new Logger();
 
 	/*==========  Protection contre les "gros" crash  ==========*/
@@ -293,6 +295,14 @@ jQuery(document).ready(function($) {
 			files.append(f);
 			document.getElementById(id).files = files;
 			if(files[0].path) $("#" + id).prev().attr('data-tooltip', files[0].path);
+		}
+	}
+
+	function doUpdate() {
+		var confirmation = confirm("Une nouvelle version du launcher est disponible!\nVoulez-vous télécharger la nouvelle mise à jour?");
+		if (confirmation) {
+			Logger.info("Ouverture de la page dans le navigateur...");
+			gui.Shell.openExternal(options.update_link);
 		}
 	}
 
