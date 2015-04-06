@@ -37,6 +37,10 @@ function Downloader(options) {
 	for(var i in options) {
 		this[i] = options[i];
 	}
+
+	if (!endsWith(this.minecraft_folder, '/')) {
+		this.minecraft_folder += "/";
+	}
 }
 
 /**
