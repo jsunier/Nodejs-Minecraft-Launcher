@@ -4,9 +4,10 @@
 
 var moment = require('moment');
 var fs = require('fs-extra');
+var path = require('path');
 
 function Logger() {
-	this.file = "usinacraft.log";
+	this.file = process.execPath.substr(0,process.execPath.lastIndexOf('/')) + 'usinacraft.log';
 	fs.ensureFileSync(this.file);
 }
 
@@ -18,6 +19,25 @@ Logger.prototype.info = function(text) {
 	console.log(text);
 	window.printInfo(text);
 	var text = "[INFO][" + moment().format('DD-MM-YYYY') + "][" + moment().format('HH:mm:ss') + "] " + text + "\r\n";
+	fs.appendFileSync(this.file, text, {encoding: 'utf8'});
+}
+
+Logger.prototype.logInfo = function(text) {
+	console.log(text);
+	var text = "[INFO][" + moment().format('DD-MM-YYYY') + "][" + moment().format('HH:mm:ss') + "] " + text + "\r\n";
+	fs.appendFileSync(this.file, text, {encoding: 'utf8'});
+}
+
+Logger.prototype.logError = function(text, error) {
+	if (error) 
+		console.log(text, error);
+	else 
+		console.log(text);
+	
+	if (typeof text === 'object') 
+		var text = "[ERROR][" + moment().format('DD-MM-YYYY') + "][" + moment().format('HH:mm:ss') + "] " + text.toSource() + "\r\n";
+	else 
+		var text = "[ERROR][" + moment().format('DD-MM-YYYY') + "][" + moment().format('HH:mm:ss') + "] " + text + "\r\n";	
 	fs.appendFileSync(this.file, text, {encoding: 'utf8'});
 }
 

@@ -1,5 +1,12 @@
 {
 	"server.name" : "Usinacraft",
+	"starting_minecraft" : "Lancement du launcher Minecraft en cours...",
+	"launching" : "Démarrage du launcher | version ",
 	"versions" : "Chargement des versions...",
-	"load_cache" : "Chargement du cache..."
+	"load_cache" : "Chargement du cache...",
+	"clear_all" : "Nettoyage du cache de l'application...",
+	"check_launcher_version": "Vérification de la version du launcher...",
+	"prepare_download" : "Préparation du téléchargement...",
+	"update_available" : "Une nouvelle version du launcher est disponible!\nVoulez-vous télécharger la nouvelle mise à jour?",
+	"open_link" : "Ouverture de la page dans le navigateur..."
 }

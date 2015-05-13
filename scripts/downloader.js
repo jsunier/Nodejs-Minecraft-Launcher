@@ -8,16 +8,7 @@ var path = require('path');
 var fs = require('fs-extra');
 var crypto = require('crypto');
 var async = require('async');
-var Cache = require('ds-cache');
 var manyHashes = require('many-file-hashes');
-var Logger = require('./logger.js');
-var cache = new Cache({
-	auto_save: true,
-	filename: 'cache.json'
-});
-cache.load();
-
-Logger = new Logger(); // Information Logger
 
 /**
  * Downloader
@@ -26,6 +17,7 @@ Logger = new Logger(); // Information Logger
 function Downloader(options) {
 	var default_args = {
 		'minecraft_folder':	".minecraft",
+		'scan_folders': ["mods", "config", "libraries"],
 		'remove_folders':	["mods", "config"],
 		'base_url':	"http://files.usinacraft.ch/"
 	}
@@ -98,41 +90,11 @@ Downloader.prototype.isUpToDate = function(local_version, callback) {
 Downloader.prototype.getLocalHashes = function(main_callback) {
 	cache.load();
 	var minecraft_folder = this.minecraft_folder;
-	var data = this.files;
-	fs.ensureDir(minecraft_folder + "mods", function(err) {
-		if (err) {
-			console.log(err);
-			main_callback();
-		}
-		else {
-			console.log("Le dossier d'installation existe!");
-			fs.readdir(minecraft_folder + "mods", function(err,files) {
-			    if (err) console.log(err);
-				var all_files = new Array();
-				async.each(files, function(file, callback) {
-					if (fs.lstatSync(minecraft_folder + "mods/" + file).isFile()) {
-						all_files.push(minecraft_folder + "mods/" + file);
-						callback();
-					}
-					else 
-						callback();
-					
-				}, function(err) {
-					var options = {
-					    files: all_files,
-					    hash: 'md5'
-					};
-
-					manyHashes(options, function(err, hashes) {
-						if (err) console.log(err);
-						cache.clear('local_hash');
-					    cache.set('local_hash', hashes);
-					    cache.save();
-					    main_callback();
-					});
-				});
-			});
-		}
+	getFoldersHashes(this.scan_folders, minecraft_folder, function(hashes) {
+		cache.clear('local_hash');
+	    cache.set('local_hash', hashes);
+	    cache.save();
+	    main_callback();
 	});
 }
 
@@ -143,7 +105,7 @@ Downloader.prototype.getLocalHashes = function(main_callback) {
 Downloader.prototype.getRemoteHashes = function(callback) {
 	cache.load();
 	var version = cache.get('selected_version');
-	http.get(this.base_url + "ressources/hash.php?version=" + version, function(res) {
+	http.get(this.base_url + "ressources/index.php?version=" + version, function(res) {
 	    var body = '';
 
 	    res.on('data', function(chunk) {
@@ -178,8 +140,8 @@ Downloader.prototype.getDifference = function(callback) {
 		var hash = local_hashes[hash];
 		local_files.push(hash.hash);
 	}
-	for(var hash in remote_hashes.files.mods) {
-		var hash = remote_hashes.files.mods[hash];
+	for(var hash in remote_hashes.files) {
+		var hash = remote_hashes.files[hash];
 		remote_files.push(hash.etag);
 	}
 
@@ -261,8 +223,9 @@ Downloader.prototype.deleteOldFiles = function(main_callback) {
 	var local_files = cache.get('local_hash');
 
 	async.eachSeries(local_files, function(file, callback) {
-		if (difference.indexOf(file.hash) > -1) {
-			fs.unlink(file.fullPath, function(err) {
+		if (difference.indexOf(file.hash) > -1 && difference.indexOf(file.hash) != false) {
+			Logger.info("Suppression de : " + file.fullPath);
+			fs.remove(file.fullPath, function(err) {
 				if (err) console.log(err);
 				callback()
 			});
@@ -314,15 +277,8 @@ Downloader.prototype.downloadFiles = function(force_update, main_callback) {
 	var download_list = new Array();
 	var base_url = this.base_url;
 
-	if (!fs.existsSync(minecraft_folder + "config") || ivn(mods_version, last_version.versions[selected_version]) || force_update)
-		cache.set('refresh_configs', true);
-	else
-		cache.set('refresh_configs', false);
-
-	cache.save();
-
-	for(var file in remote_files.files.mods) {
-		var file = remote_files.files.mods[file];
+	for(var file in remote_files.files) {
+		var file = remote_files.files[file];
 		if (difference.indexOf(file.etag) > -1 || force_update) {
 			download_list.push(file.path);
 		}
@@ -343,7 +299,7 @@ Downloader.prototype.downloadFiles = function(force_update, main_callback) {
 		}
 	}, function(err) {
 		if (err) console.log(err);
-		Logger.info('Téléchargement des mods terminé.');
+		Logger.info('Téléchargement des fichiers terminé.');
 		main_callback();
 	});
 
@@ -353,7 +309,7 @@ Downloader.prototype.downloadFiles = function(force_update, main_callback) {
  * Téléchargement des configurations des mods selon la différence entre les hashes distants et les hashes locaux
  * @param  {Function} main_callback
  */
-Downloader.prototype.downloadConfigs = function(main_callback) {
+Downloader.prototype.downloadLibraries = function(main_callback) {
 	cache.load();
 	var download_list = new Array();
 	var minecraft_folder = this.minecraft_folder;
@@ -361,13 +317,9 @@ Downloader.prototype.downloadConfigs = function(main_callback) {
 	var remote_files = cache.get('remote_hash');
 	var base_url = this.base_url;
 
-	for(var file in remote_files.files.config) {
-		var file = remote_files.files.config[file];
+	for(var file in remote_files.libraries) {
+		var file = remote_files.libraries[file];
 		download_list.push(file.path);
-	}
-
-	if(!fs.existsSync(minecraft_folder + "config")) {
-		fs.mkdirSync(minecraft_folder + "config");
 	}
 
     var loader = window.document.getElementById('loader');
@@ -375,9 +327,9 @@ Downloader.prototype.downloadConfigs = function(main_callback) {
 
 	async.eachSeries(download_list, function(file, callback) {
 		if (!endsWith(file, '/')) {
-			var url = base_url + 'ressources/' + selected_version + "/" + file;
-			var dest = minecraft_folder + file;
-			Logger.info("Téléchargement de: " + file);
+			var url = base_url + 'ressources/libraries/' + file;
+			var dest = minecraft_folder + "libraries/" + file;
+			Logger.info("Téléchargement de la librairie : " + file);
 			downloadFile(dest, url, callback);
 		}
 		else {
@@ -385,7 +337,7 @@ Downloader.prototype.downloadConfigs = function(main_callback) {
 		}
 	}, function(err) {
 		if (err) console.log(err);
-		Logger.info('Téléchargement des configurations terminé.');
+		Logger.info('Téléchargement des librairies terminé.');
 		main_callback();
 	});
 }
@@ -432,6 +384,50 @@ function downloadFile(dest, url, callback) {
 			Logger.error(e);
 			callback();
 		}
+	});
+}
+
+/**
+ * Scan tous les dossiers du tableau et récupère tous les "hash" de chaque fichier
+ * @param  {[type]} folders          [description]
+ * @param  {[type]} minecraft_folder [description]
+ * @param  {[type]} main_callback    [description]
+ * @return {[type]}                  [description]
+ */
+function getFoldersHashes(folders, minecraft_folder, main_callback) {
+	var all_files = new Array();
+	async.each(folders, function(folder, callback_1) {
+		fs.ensureDir(minecraft_folder + folder, function(err) {
+			if (err) {
+				console.log(err);
+				callback_1();
+			}
+			else {
+				fs.readdir(minecraft_folder + folder, function(err,files) {
+				    if (err) console.log(err);
+					async.each(files, function(file, callback) {
+						if (fs.lstatSync(minecraft_folder + folder + "/" + file).isFile()) {
+							all_files.push(minecraft_folder + folder + "/" + file);
+							callback();
+						}
+						else 
+							callback();
+					}, function(err) {
+						callback_1();
+					});
+				});
+			}
+		});
+	}, function(err) {
+		if (err) {
+			Logger.error(err);
+			main_callback();
+		}
+
+		manyHashes({files: all_files, hash: 'md5'}, function(err, hashes) {
+			if (err) console.log(err);
+		    main_callback(hashes);
+		});
 	});
 }
 
