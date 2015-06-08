@@ -50,7 +50,7 @@
       "email": "exitedprotek@gmail.com"
     }
   ],
-  "version": "2.0.6",
+  "version": "2.1.0",
   "snapshot": "",
   "dependencies": {
     "asap": "^2.0.1",
@@ -64,7 +64,8 @@
     "mcms-node-localization": "0.0.3",
     "memory-cache": "^0.1.2",
     "moment": "^2.9.0",
-    "node-curl-download": "0.0.2"
+    "node-curl-download": "0.0.2",
+    "pragma-logger": "~0.2.5"
   },
   "keywords": [
     "usinacraft",

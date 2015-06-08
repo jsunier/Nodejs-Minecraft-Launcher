@@ -1,0 +1,14 @@
+{
+	"base" : "Téléchargement des fichiers de base en cours...",
+	"files" : "Téléchargement des fichiers en cours...",
+	"libraries" : "Téléchargement des librairies...",
+	"get_local_hashes" : "Récupération des MD5 locaux...",
+	"get_remote_hashes" : "Récupération des MD5 distants...",
+	"get_difference" : "Calcul des différences entre les fichiers locaux et distants...",
+	"delete_folders" : "Suppression des mods pour le force udpate...",
+	"delete_files" : "Suppression des fichiers en trop...",
+	"reset_profile" : "Remise à zéro du profil dans le launcher...",
+	"reset_profile_done" : "Remise à zéro du profil terminée.",
+	"done" : "Téléchargement et installation terminés!",
+	"apply_profiles_changes" : "Application de la nouvelle version dans le profil du launcher"
+}

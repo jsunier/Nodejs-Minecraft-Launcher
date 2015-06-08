@@ -1,0 +1,5 @@
+{
+	"error" : "Erreur: {{err}}",
+	"loading_versions" : "Erreur lors du chargement des versions: ",
+	"reset_profile" : "Erreur lors de la remise à zéro du profil: "
+}
