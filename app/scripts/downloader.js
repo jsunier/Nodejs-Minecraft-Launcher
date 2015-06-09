@@ -41,30 +41,10 @@ Downloader.prototype.setMainDir = function(dir) {
 		if (!endsWith(this.main_dir, '/')) {
 			this.main_dir += "/";
 		}
+		db('system.configurations').chain().first().assign({
+			minecraft_folder: dir
+		}).value();
 	}
-}
-
-Downloader.prototype.load = function(callback) {
-	cache.load();
-	Log.info("Chargement des versions en cours...");
-	http.get(this.base_url + "launcher/versions.json", function(res) {
-	    var body = '';
-
-	    res.on('data', function(chunk) {
-	        body += chunk;
-	    });
-
-	    res.on('end', function() {
-	        var JSONResponse = JSON.parse(body);
-	        cache.set('remote_versions', JSONResponse);
-        	cache.save();
-        	Log.clear();
-        	callback(JSONResponse);
-	    });
-	}).on('error', function(e) {
-		Log.error("Erreur lors du chargement des versions: ", e);
-	    throw e;
-	});
 }
 
 /**
@@ -72,7 +52,6 @@ Downloader.prototype.load = function(callback) {
  * @param  {Function} callback 
  */
 Downloader.prototype.getVersions = function(callback) {
-	cache.load();
 	http.get(this.base_url + "launcher/versions.json", function(res) {
 	    var body = '';
 
@@ -213,8 +192,6 @@ Downloader.prototype.getDifference = function(callback) {
 	        callback();
 	    }
 	});
-
-
 }
 
 /**

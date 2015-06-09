@@ -1,72 +1,9 @@
 {
-  "webexe_settings": {
-    "linux-x32": true,
-    "windows-x64": true,
-    "download_dir": "F:\\Logiciels\\Web2ExeWin\\files\\downloads",
-    "nw_compression_level": 5,
-    "mac-x32": true,
-    "windows-x32": true,
-    "mac-x64": true,
-    "nw_version": "0.11.6",
-    "force_download": true,
-    "linux-x64": true
-  },
-  "node-main": "",
-  "single-instance": true,
-  "description": "Launcher officiel d'Usinacraft",
+  "app_name": "usinacraft_nodejs_launcher",
   "nodejs": true,
-  "user-agent": "",
   "additional_trust_anchors": "",
-  "window": {
-    "transparent": false,
-    "fullscreen": false,
-    "resizable": false,
-    "title": "Usinacraft Launcher",
-    "always-on-top": false,
-    "frame": true,
-    "height": 530,
-    "exe_icon": "app\\css\\images\\favicon.png",
-    "visible": true,
-    "as_desktop": true,
-    "position": "center",
-    "show_in_taskbar": true,
-    "mac_icon": "app\\css\\images\\favicon.png",
-    "width": 800,
-    "toolbar": true,
-    "icon": "app/css/images/favicon.png"
-  },
-  "js-flags": "",
-  "name": "usinacraft-launcher",
   "inject-js-end": "",
-  "webkit": {
-    "page-cache": false,
-    "java": true,
-    "plugin": false
-  },
-  "maintainers": [
-    {
-      "web": "https://www.twitter.com/ExiTed_ProTeK",
-      "name": "ProTeK",
-      "email": "exitedprotek@gmail.com"
-    }
-  ],
-  "version": "2.1.0",
-  "snapshot": "",
-  "dependencies": {
-    "asap": "^2.0.1",
-    "async": "~0.9.0",
-    "ds-cache": "0.0.7",
-    "fs-extra": "^0.18.0",
-    "glob": "^5.0.3",
-    "is-version-newer": "^2.1.0",
-    "lodash": "^3.6.0",
-    "many-file-hashes": "^0.4.1",
-    "mcms-node-localization": "0.0.3",
-    "memory-cache": "^0.1.2",
-    "moment": "^2.9.0",
-    "node-curl-download": "0.0.2",
-    "pragma-logger": "~0.2.5"
-  },
+  "node-remote": "",
   "keywords": [
     "usinacraft",
     "minecraft",
@@ -74,8 +11,77 @@
     "suisse",
     "ProTeK"
   ],
+  "user-agent": "",
+  "window": {
+    "fullscreen": false,
+    "kiosk_emulation": false,
+    "resizable": false,
+    "title": "Usinacraft Launcher",
+    "always-on-top": false,
+    "frame": true,
+    "width": 800,
+    "kiosk": false,
+    "height": 530,
+    "exe_icon": "app\\css\\images\\favicon.png",
+    "visible": true,
+    "as_desktop": true,
+    "show": true,
+    "position": "center",
+    "show_in_taskbar": true,
+    "mac_icon": "app\\css\\images\\favicon.png",
+    "transparent": false,
+    "toolbar": true,
+    "icon": "app/css/images/favicon.png"
+  },
+  "version": "2.1.0",
   "inject-js-start": "",
-  "node-remote": "",
   "main": "index.html",
-  "chromium-args": ""
+  "chromium-args": "",
+  "webexe_settings": {
+    "linux-x32": true,
+    "export_dir": "E:\\Documents\\Usinacraft\\output",
+    "windows-x64": true,
+    "download_dir": "F:\\Logiciels\\Web2ExeWin\\files\\downloads",
+    "nw_compression_level": 0,
+    "mac-x32": true,
+    "windows-x32": true,
+    "mac-x64": true,
+    "nw_version": "0.12.1",
+    "force_download": false,
+    "linux-x64": true
+  },
+  "description": "Launcher officiel d'Usinacraft",
+  "maintainers": [
+    {
+      "web": "https://www.twitter.com/ExiTed_ProTeK",
+      "name": "ProTeK",
+      "email": "exitedprotek@gmail.com"
+    }
+  ],
+  "dependencies": {
+    "pragma-logger": "~0.2.5",
+    "node-curl-download": "0.0.2",
+    "lodash": "^3.6.0",
+    "is-version-newer": "^2.1.0",
+    "glob": "^5.0.3",
+    "asap": "^2.0.1",
+    "many-file-hashes": "^0.4.1",
+    "mcms-node-localization": "0.0.3",
+    "fs-extra": "^0.18.0",
+    "moment": "^2.9.0",
+    "memory-cache": "^0.1.2",
+    "ds-cache": "0.0.7",
+    "async": "~0.9.0",
+    "lowdb": "~0.8.1"
+  },
+  "webkit": {
+    "page-cache": false,
+    "java": true,
+    "plugin": false
+  },
+  "js-flags": "",
+  "name": "usinacraft-launcher",
+  "single-instance": true,
+  "snapshot": "",
+  "node-main": ""
 }

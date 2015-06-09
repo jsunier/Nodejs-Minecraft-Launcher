@@ -12,7 +12,8 @@ jQuery(document).ready(function($) {
 	var Lang = require('mcms-node-localization');
 	var DownloaderClass = require('./app/scripts/downloader.js');
 	var Downloader = new DownloaderClass();
-	var Cache = require('ds-cache');
+	var LowDB = require('lowdb');
+	var db = new LowDB('db.json');
 	var LoggerClass = require('./app/scripts/logger.js');
 	var Log = new LoggerClass({
 		info: printInfo,
@@ -20,41 +21,20 @@ jQuery(document).ready(function($) {
 		warn: printWarn,
 		clear: clearPrint
 	});
+	var SystemClass = require('./app/scripts/system.js');
+	var System = new SystemClass();
 	var locales = ['fr', 'en']; //assuming you have 2 languages
 	// Définition des langues
 	var t = new Lang({
 	    directory : './app/locales',
 	    locales : locales
 	});
-	var cache = new Cache({
-		limit_bytes: '5M',
-		auto_save: true,
-		filename: 'cache.json'
-	});
 
 	Log.info("Démarrage du launcher d'Usinacraft en cours...");
 
-	/*==========  Détection du système d'exploitation  ==========*/
-
-	Log.debug("Définition des variables...");
-	
-	var isWin = /^win/.test(process.platform);
-	var user_folder = process.env[isWin ? 'USERPROFILE' : 'HOME'];
-	var options = {
-		version: gui.App.manifest.version.toString(),
-		minecraft_folder: getMinecraftFolder(isWin, user_folder),
-		minecraft_launcher: getMinecraftLauncher(isWin, user_folder),
-		title: " - BETA v" + gui.App.manifest.version.toString(),
-		update_link: "http://usinacraft.ch/server/launcher",
-		is_windows : isWin,
-		user_folder : user_folder,
-		launch_minecraft: true
-	};
-
-	t.add(); // Initialisation des langues
-	t.setLocale('fr');
-
 	/*==========  Ajout des fonctions principales à "window"  ==========*/
+	
+	Log.debug("Définition des variables...");
 	
 	window.printInfo = printInfo;
 	window.printError = printError;
@@ -65,10 +45,13 @@ jQuery(document).ready(function($) {
 	
 	/*==========  Variables globales  ==========*/
 	
-	global.cache = cache;
+	t.add(); // Initialisation des langues
+	t.setLocale('fr');
+
+	global.db = db;
 	global.t = t;
-	global.options = options;
 	global.Log = Log;
+	global.$ = $;
 
 	/*==========  Protection contre les "gros" crash  ==========*/
 
@@ -78,39 +61,29 @@ jQuery(document).ready(function($) {
 
 	/*==========  Au démarrage du launcher  ==========*/
 	
-	lockInterface();
-	setup();
-	Log.info(t.get('info.launching') + options.version);
-	$('title').append(options.title);
-	$('#main-background').animate({opacity: 1}, 1700); // Animation du background
-
-	/*==========  Application des valeurs aux champs de type "file"  ==========*/
-	
-	setInputFile(options.minecraft_folder, 'installation-folder');
-	setInputFile(options.minecraft_launcher, 'minecraft-launcher');
-
-	Log.info(t.get('info.load_cache'));
-
-	/*==========  Définition du système de téléchargement  ==========*/
-
-	Downloader.setMainDir(options.minecraft_folder);
-
-	/*==========  Application des versions  ==========*/
-
-	Downloader.load(function(versions) {
+	System.setup(function() { // Application des versions
 		$('#version option').remove();
-		for(var version in versions.versions) {
-			if (versions.latest == version) {
+		db.reload();
+		console.log(db('minecraft.versions').first());
+		var latest = db('minecraft.versions').first().latest;
+		for(var version in db('minecraft.versions').first().all) {
+			if (latest == version) {
 				$('#version').append('<option value="' + version + '" selected>' + version + '</option>');
 			}
 			else {
 				$('#version').append('<option value="' + version + '">' + version + '</option>');
 			}
 		}
-		var remote_versions = cache.get('remote_versions');
-		Log.debug(remote_versions.versions[cache.get('selected_version')]);
-		unlockInterface();
+		setInputFile(db('system.configurations').first().minecraft_folder, 'installation-folder');
+		setInputFile(db('system.configurations').first().minecraft_launcher, 'minecraft-launcher');
+		Downloader.setMainDir(db('system.configurations').first().user_folder);
 	});
+	Log.info(t.get('info.launching') + System.launcher_version);
+	$('title').append(System.title);
+	$('#main-background').animate({opacity: 1}, 1700); // Animation du background
+
+	/*==========  Définition du système de téléchargement  ==========*/
+
 
 	/*==========  Démarrage du téléchargement  ==========*/
 
@@ -130,7 +103,7 @@ jQuery(document).ready(function($) {
 
 		/*==========  Définition du système de téléchargement  ==========*/
 
-		Downloader.setMainDir(options.minecraft_folder);
+		Downloader.setMainDir(System.minecraft_folder);
 
 		/*==========  Démarrage des tâches  ==========*/
 
@@ -259,33 +232,9 @@ jQuery(document).ready(function($) {
 
 	/*==========  Main functions  ==========*/
 
-	function setup() {
-		Log.info("Configuration du launcher en cours...");
-		cache.set('launcher_version', options.version);
-		async.series([
-			function(callback) {
-				if(gui.App.argv.indexOf("--reset") > -1) {
-					Log.info(t.get('info.clear_all'));
-					cache.clear();
-					gui.App.clearCache();
-					callback();
-				}
-				else callback();
-			},
-			function(callback) {
-				Log.info(t.get('info.check_launcher_version'));
-				Downloader.isUpToDate(options.version, callback);
-			}
-		], function(err, results) {
-			clearPrint();
-			ready();
-			unlockInterface();
-		});
-	}
-
 	function launchMinecraft() {
 		cache.load();
-		if(options.launch_minecraft) {
+		if(System.launch_minecraft_on_finish) {
 			Log.info(t.get("info.starting_minecraft"));
 			setTimeout(function() {
 				require('child_process').exec(cache.get('minecraft_launcher')).unref();
@@ -293,6 +242,21 @@ jQuery(document).ready(function($) {
 					gui.App.quit();
 				}, 2000);
 			}, 500);
+		}
+	}
+
+	/**
+	 * Vérifie si le launcher est prêt pour le téléchargement
+	 * @return {Boolean} true : si le launcher est prêt, false : si le launcher n'est pas prêt
+	 */
+	function ready() {
+		if($("#installation-folder").val() == "" || $('#minecraft-launcher').val() == "") {
+			$('#connection').attr('disabled', 'disabled');
+			return false;
+		}
+		else {
+			$('#connection').removeAttr('disabled');
+			return true;
 		}
 	}
 
@@ -351,7 +315,7 @@ jQuery(document).ready(function($) {
 		var confirmation = confirm(t.get('info.update_available'));
 		if (confirmation) {
 			Log.info(t.get('info.open_link'));
-			gui.Shell.openExternal(options.update_link);
+			gui.Shell.openExternal(System.update_url);
 		}
 	}
 
