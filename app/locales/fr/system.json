@@ -1,0 +1,8 @@
+{
+	"setup" : "Configurations du launcher en cours de chargement...",
+	"base_folder" : "Le dossier de base a été défini sur : %s",
+	"clear_all" : "Nettoyage du cache de l'application...",
+	"loading_versions" : "Chargement des versions en cours...",
+	"update_available" : "Une nouvelle version du launcher est disponible!",
+	"no_update_available" : "Le launcher est à jour"
+}

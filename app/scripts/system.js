@@ -5,21 +5,6 @@
 /*==========  Variables  ==========*/
 
 var gui = global.window.nwDispatcher.requireNwGui();
-/*
-var isWin = /^win/.test(process.platform);
-var user_folder = process.env[isWin ? 'USERPROFILE' : 'HOME'];
-var options = {
-	version: gui.App.manifest.version.toString(),
-	minecraft_folder: getMinecraftFolder(isWin, user_folder),
-	minecraft_launcher: getMinecraftLauncher(isWin, user_folder),
-	title: " - BETA v" + gui.App.manifest.version.toString(),
-	update_link: "http://usinacraft.ch/server/launcher",
-	is_windows : isWin,
-	user_folder : user_folder,
-	launch_minecraft: true
-};*/
-var LowDB = require('lowdb');
-var db = new LowDB('db.json');
 var async = require('async');
 var ivn = require('is-version-newer');
 var http = require('http');
@@ -39,6 +24,8 @@ function System() {
 		mac: /^mac/.test(this.os)
 	}
 	this.user_folder = process.env[this.is.windows ? 'USERPROFILE' : 'HOME'];
+	this.minecraft_folder = this.is.windows ? this.user_folder + "/Appdata/Roaming/.minecraft" : this.user_folder + "/.minecraft";
+	this.minecraft_launcher = this.is.windows ? this.user_folder + "/Desktop/Minecraft.exe" : null;
 	this.launcher_version = gui.App.manifest.version.toString();
 	this.title = " - BETA v" + this.launcher_version;
 	this.base_url = "http://files.usinacraft.ch/";
@@ -51,60 +38,101 @@ function System() {
  * @return {[type]} [description]
  */
 System.prototype.setup = function(main_callback) {
-	Log.info("Configurations du launcher en cours de chargement...");
+	Log.info(t.get('system.setup'));
 
 	window.lockInterface();
 
 	var options = this;
+	db.reload();
 
 	async.series([
 		function(callback) {
 			if(gui.App.argv.indexOf("--reset") > -1) {
-				Log.info(t.get('info.clear_all'));
-				db('system.configurations').remove();
+				Log.info(t.get('system.clear_all'));
+				db.delete('/');
 				gui.App.clearCache();
 			}
 			callback();
 		},
-		function(callback) { // Si la base de données n'existe pas, on la créé
-			if (db("system.configurations").size() == 0) {
-				db("system.configurations").push({
+		function(callback) {
+			try {
+				db.getData("/system/configurations");	
+			}
+			catch (err) {
+				db.push('/system/configurations', {
 					os: options.os,
 					is: options.is,
 					user_folder: options.user_folder,
 					base_url: options.base_url,
 					update_url: options.update_url,
 					launcher_version: options.launcher_version,
-					launch_minecraft_on_finish: true
+					launch_minecraft_on_finish: true,
 				});
-				callback();
 			}
-			else callback();
+			callback();
 		},
 		function(callback) {
-			if (db('launcher.version').size() == 0) {
-				db('launcher.version').push({
+			fs.stat(options.minecraft_folder, function (err, stats) {
+				if (err == null) {
+					Log.debug(t.get('system.base_folder', options.minecraft_folder));
+					db.push('/system/configurations', {
+						minecraft_folder: options.minecraft_folder
+					}, false);
+				}
+				else {
+					db.push('/system/configurations', {
+						minecraft_folder: ""
+					}, false);
+					Log.debug(t.get('error.base_folder_not_found'));
+				}
+				setTimeout(callback, 300);
+			});
+		},
+		function(callback) {
+			fs.stat(options.minecraft_launcher, function (err, stats) {
+				if (err == null) {
+					Log.debug(t.get('system.base_launcher', options.minecraft_launcher));
+					db.push('/system/configurations', {
+						minecraft_launcher: options.minecraft_launcher
+					}, false);
+				}
+				else {
+					Log.debug(t.get('error.base_launcher_not_found'));
+					db.push('/system/configurations', {
+						minecraft_launcher: ""
+					}, false);
+				}
+				setTimeout(callback, 300);
+			});
+		},
+		function(callback) {
+			try	{
+				db.getData('/launcher/version');
+			} 
+			catch (err) {
+				db.push('/launcher/version', {
 					local: '0.0.0',
 					remote: '0.0.0'
 				});
-				callback();
 			}
-			else callback();
+			callback();
 		},
 		function(callback) {
-			if (db('minecraft.versions').size() == 0) {
-				db('minecraft.versions').push({
-					all: {},
-					latest: "Usinacraft"
-				});
-				callback();
+			try {
+				db.getData('/minecraft/versions');
 			}
-			else callback();
+			catch (err) {
+				db.push('/minecraft/versions', {
+					all: {},
+					latest: "Usinacraft 2.0.0"
+				});
+			}
+			callback();
 		},
 		function(callback) {
 			// Application des informations conservés dans la base de données
-			for(var i in db('system.configurations').first()) {
-				this[i] = db('system.configurations').first()[i];
+			for(var i in db.getData('/system/configurations')) {
+				this[i] = db.getData('/system/configurations')[i];
 			}
 			callback();
 		},
@@ -130,8 +158,9 @@ System.prototype.setup = function(main_callback) {
  * @return {[type]}            [description]
  */
 System.prototype.loadVersions = function(launcher_version, callback) {
-	Log.info("Chargement des versions en cours...");
-	http.get(db('system.configurations').first().base_url + "launcher/versions.json", function(res) {
+	Log.info(t.get('system.loading_versions'));
+	db.reload();
+	http.get(db.getData('/system/configurations').base_url + "launcher/versions.json", function(res) {
 	    var body = '';
 
 	    res.on('data', function(chunk) {
@@ -141,23 +170,23 @@ System.prototype.loadVersions = function(launcher_version, callback) {
 	    res.on('end', function() {
 	        var JSONResponse = JSON.parse(body); // Parsing data to JSON Object
 	        // Ajout des versions du launcher
-	        db('launcher.version').chain().first().assign({
+	        db.push('/launcher/version', {
 	        	local: launcher_version,
 	        	remote: JSONResponse.launcher
-	        }).value();
+	        });
 	        // Ajout des versions de Minecraft disponibles et la dernière disponible
-	        db('minecraft.versions').chain().first().assign({
+	        db.push('/minecraft/versions', {
 	        	all: JSONResponse.versions,
 	        	latest: JSONResponse.latest
-	        }).value();
+	        });
 	        
         	Log.clear();
         	setTimeout(function() {
         		callback();
-        	}, 200);
+        	}, 500);
 	    });
 	}).on('error', function(e) {
-		Log.error("Erreur lors du chargement des versions: ", e);
+		Log.error(t.get('error.loading_versions'), e);
 	    throw e;
 	});
 }
@@ -167,20 +196,36 @@ System.prototype.loadVersions = function(launcher_version, callback) {
  * @param  {Function} callback [description]
  */
 System.prototype.isUpToDate = function(callback) {
-	if (db('launcher.version') == "") {
-		Log.error("Impossible de vérifier la version du launcher");
+	db.reload();
+	if (db.getData('/launcher/version').remote == "0.0.0") {
+		Log.error(t.get('error.check_launcher_update'));
 		callback();
 	}
 	else {
-		if (ivn(db('launcher.version').first().local, db('launcher.version').first().remote)) {
-			Log.info("Une nouvelle version du launcher est disponible!");
+		if (ivn(db.getData('/launcher/version').local, db.getData('/launcher/version').remote)) {
+			Log.info(t.get('system.update_available'));
 			window.doUpdate();
 		} else {
-		  	Log.info("Le launcher est à jour");
+		  	Log.info(t.get('system.no_update_available'));
 		}
 		callback();
 	}
 	
+}
+
+/**
+ * Permet de vérifier si les mods sont à jour (au niveau de la version local dans un fichier)
+ * @param  {Function} callback
+ * @return {Boolean}           [description]
+ */
+System.prototype.isModsUpToDate = function(callback) {
+	if (ivn(db.getData('/minecraft/versions').all[db.getData('/launcher/selected_version')], db.getData('/minecraft/versions/local'))) {
+		callback(true);
+		return true;
+	} else {
+	  	callback(false);
+	  	return false;
+	}
 }
 
 module.exports = System;

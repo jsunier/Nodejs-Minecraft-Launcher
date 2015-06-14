@@ -1,5 +1,11 @@
 {
 	"error" : "Erreur: {{err}}",
+	"get_mods_local_version" : "Impossible de déterminer la version locale des mods: ",
 	"loading_versions" : "Erreur lors du chargement des versions: ",
-	"reset_profile" : "Erreur lors de la remise à zéro du profil: "
+	"loading_hashes" : "Erreur lors du chargement des hashes: ",
+	"reset_profile" : "Erreur lors de la remise à zéro du profil: ",
+	"check_launcher_update" : "Impossible de vérifier la version du launcher",
+	"base_folder_not_found" : "Le dossier de base n'existe pas et/ou n'a pas été trouvé",
+	"base_launcher_not_found" : "Le launcher n'existe pas et/ou n'a pas été trouvé",
+	"bad_launcher" : "Le launcher n'est pas un executable reconnu par le launcher. L'extension doit être : (.exe, .jar, .ink, .app ou rien sur Linux)"
 }

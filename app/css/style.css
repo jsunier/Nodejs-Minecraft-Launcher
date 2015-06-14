@@ -1,4 +1,3 @@
-@charset "UTF-8";
 /*=================================
 =            Variables            =
 =================================*/
@@ -159,8 +158,16 @@ a, a:visited {
   color: #FAFAFA;
   border-color: #545454;
 }
-
+/* line 140, ../scss/style.scss */
+.basic-select.error-state {
+  border-color: #B71C1C;
+}
 /* line 142, ../scss/style.scss */
+.basic-select.error-state:hover {
+  border-color: #d62121;
+}
+
+/* line 148, ../scss/style.scss */
 .basic-button {
   display: inline-block;
   background: #03A9F4;
@@ -169,6 +176,7 @@ a, a:visited {
   padding: 10px 15px;
   border: none;
   cursor: pointer;
+  position: relative;
   -moz-box-shadow: 0 1px 5px #3b3b3b;
   -webkit-box-shadow: 0 1px 5px #3b3b3b;
   box-shadow: 0 1px 5px #3b3b3b;
@@ -180,7 +188,7 @@ a, a:visited {
   -webkit-border-radius: 2px;
   border-radius: 2px;
 }
-/* line 153, ../scss/style.scss */
+/* line 160, ../scss/style.scss */
 .basic-button:hover {
   background: #0394d6;
   -moz-transition: background 300ms, box-shadow 250ms;
@@ -188,11 +196,20 @@ a, a:visited {
   -webkit-transition: background 300ms, box-shadow 250ms;
   transition: background 300ms, box-shadow 250ms;
 }
-/* line 157, ../scss/style.scss */
+/* line 163, ../scss/style.scss */
+.basic-button:hover span.tooltip {
+  visibility: visible;
+  opacity: 0.85;
+  bottom: 40px;
+  left: 0;
+  z-index: 999;
+  margin-left: -7px;
+}
+/* line 172, ../scss/style.scss */
 .basic-button:focus {
   outline: none;
 }
-/* line 160, ../scss/style.scss */
+/* line 175, ../scss/style.scss */
 .basic-button:active {
   background: #038dcc;
   outline: none;
@@ -204,477 +221,155 @@ a, a:visited {
   -webkit-box-shadow: 0 3px 12px #3b3b3b;
   box-shadow: 0 3px 12px #3b3b3b;
 }
-/* line 166, ../scss/style.scss */
+/* line 181, ../scss/style.scss */
 .basic-button:disabled {
   background: #6e6e6e;
   cursor: default;
 }
-
-/* line 172, ../scss/style.scss */
-.basic-checkbox {
-  /* Coch├®e */
-  /* Aspect si "pas coch├®e" */
-  /* Aspect si "coch├®e" */
-  /* Aspect d├®sactiv├®e */
-  /* styles de la coche (si coch├®e/d├®sactiv├®e) */
-  /* on style aussi le label quand d├®sactiv├® */
+/* line 185, ../scss/style.scss */
+.basic-button.error-state {
+  background-color: #B71C1C;
+  -moz-transition: background 250ms, box-shadow 250ms;
+  -o-transition: background 250ms, box-shadow 250ms;
+  -webkit-transition: background 250ms, box-shadow 250ms;
+  transition: background 250ms, box-shadow 250ms;
+  -moz-box-shadow: 0 3px 12px #751212;
+  -webkit-box-shadow: 0 3px 12px #751212;
+  box-shadow: 0 3px 12px #751212;
 }
-/* line 173, ../scss/style.scss */
-.basic-checkbox [type="checkbox"]:not(:checked), .basic-checkbox [type="checkbox"]:checked {
+/* line 189, ../scss/style.scss */
+.basic-button.error-state span.tooltip {
+  background-color: #B71C1C;
+}
+/* line 191, ../scss/style.scss */
+.basic-button.error-state span.tooltip:after {
+  border-top: 8px solid #B71C1C;
+}
+/* line 195, ../scss/style.scss */
+.basic-button.error-state:hover {
+  background-color: #d62121;
+}
+/* line 199, ../scss/style.scss */
+.basic-button span.tooltip {
   position: absolute;
-  left: -9999px;
+  width: 100%;
+  padding: 10px 7px;
+  color: #FAFAFA;
+  background: #03A9F4;
+  height: auto;
+  text-align: center;
+  visibility: hidden;
+  word-break: break-all;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  border-radius: 4px;
 }
-/* line 177, ../scss/style.scss */
-.basic-checkbox [type="checkbox"]:not(:checked) + label, .basic-checkbox [type="checkbox"]:checked + label {
-  position: relative;
-  /* permet de positionner les pseudo-├®l├®ments */
-  padding-left: 25px;
-  /* fait un peu d'espace pour notre case ├á venir */
-  cursor: pointer;
-  /* affiche un curseur adapt├® */
-}
-/* line 182, ../scss/style.scss */
-.basic-checkbox [type="checkbox"]:not(:checked) + label:before, .basic-checkbox [type="checkbox"]:checked + label:before {
+/* line 210, ../scss/style.scss */
+.basic-button span.tooltip:after {
   content: '';
   position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -8px;
+  width: 0;
+  height: 0;
+  border-top: 8px solid #03A9F4;
+  border-right: 8px solid transparent;
+  border-left: 8px solid transparent;
+}
+
+/* line 224, ../scss/style.scss */
+.basic-checkbox-group {
+  position: relative;
+  display: inline-block;
+  margin: 0 5px;
+}
+/* line 228, ../scss/style.scss */
+.basic-checkbox-group input[type=checkbox] {
+  display: none;
+}
+/* line 230, ../scss/style.scss */
+.basic-checkbox-group input[type=checkbox]:checked ~ label .box {
+  background: #03A9F4;
+}
+/* line 233, ../scss/style.scss */
+.basic-checkbox-group input[type=checkbox]:checked ~ label .check {
+  opacity: 1;
+  -moz-transform: scale(1) rotate(45deg);
+  -ms-transform: scale(1) rotate(45deg);
+  -webkit-transform: scale(1) rotate(45deg);
+  transform: scale(1) rotate(45deg);
+}
+/* line 237, ../scss/style.scss */
+.basic-checkbox-group input[type=checkbox]:disabled ~ label .box {
+  background: #6e6e6e;
+}
+/* line 241, ../scss/style.scss */
+.basic-checkbox-group label {
+  padding-left: 30px;
+  cursor: pointer;
+}
+/* line 244, ../scss/style.scss */
+.basic-checkbox-group label span {
+  display: block;
+  position: absolute;
   left: 0;
-  top: 2px;
-  width: 17px;
-  height: 17px;
-  border: 1px solid #ededed;
-  background: #FAFAFA;
+  -moz-transition-duration: 300ms;
+  -o-transition-duration: 300ms;
+  -webkit-transition-duration: 300ms;
+  transition-duration: 300ms;
+}
+/* line 250, ../scss/style.scss */
+.basic-checkbox-group label .box {
+  background: #d9e1e7;
+  height: 22px;
+  width: 22px;
+  z-index: 9;
   -moz-border-radius: 3px;
   -webkit-border-radius: 3px;
   border-radius: 3px;
-  -moz-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
-  -webkit-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+  -moz-transition-delay: 200ms;
+  -o-transition-delay: 200ms;
+  -webkit-transition-delay: 200ms;
+  transition-delay: 200ms;
 }
-/* line 195, ../scss/style.scss */
-.basic-checkbox [type="checkbox"]:not(:checked) + label:after, .basic-checkbox [type="checkbox"]:checked + label:after {
-  content: '\e805';
-  font-family: 'fontello';
-  position: absolute;
-  top: 2px;
-  left: 3px;
-  font-size: 14px;
-  color: #03A9F4;
-  -moz-transition: all 200ms;
-  -o-transition: all 200ms;
-  -webkit-transition: all 200ms;
-  transition: all 200ms;
-}
-/* line 206, ../scss/style.scss */
-.basic-checkbox [type="checkbox"]:not(:checked) + label:after {
+/* line 258, ../scss/style.scss */
+.basic-checkbox-group label .check {
+  top: 0;
+  left: 7px;
+  width: 7px;
+  height: 15px;
+  border: 2px solid #FAFAFA;
+  border-top: none;
+  border-left: none;
   opacity: 0;
-  -moz-transform: scale(0);
-  -ms-transform: scale(0);
-  -webkit-transform: scale(0);
-  transform: scale(0);
-}
-/* line 211, ../scss/style.scss */
-.basic-checkbox [type="checkbox"]:checked + label:after {
-  opacity: 1;
-  -moz-transform: scale(1);
-  -ms-transform: scale(1);
-  -webkit-transform: scale(1);
-  transform: scale(1);
-}
-/* line 216, ../scss/style.scss */
-.basic-checkbox [type="checkbox"]:disabled:not(:checked) + label:before,
-.basic-checkbox [type="checkbox"]:disabled:checked + label:before {
-  box-shadow: none;
-  border-color: #bbb;
-  background-color: #ddd;
-}
-/* line 223, ../scss/style.scss */
-.basic-checkbox [type="checkbox"]:disabled:checked + label:after {
-  color: #999;
-}
-/* line 227, ../scss/style.scss */
-.basic-checkbox [type="checkbox"]:disabled + label {
-  color: #aaa;
-  cursor: default;
+  z-index: 10;
+  -moz-transform: rotate(180deg);
+  -ms-transform: rotate(180deg);
+  -webkit-transform: rotate(180deg);
+  transform: rotate(180deg);
+  -moz-transition-delay: 300ms;
+  -o-transition-delay: 300ms;
+  -webkit-transition-delay: 300ms;
+  transition-delay: 300ms;
 }
 
-/* line 233, ../scss/style.scss */
+/* line 274, ../scss/style.scss */
 .row, .min-row {
   width: 100%;
   margin: 15px auto;
   display: block;
 }
 
-/* line 239, ../scss/style.scss */
+/* line 280, ../scss/style.scss */
 .min-row {
   width: 95% !important;
-}
-
-/*================================
-=            Tooltips            =
-================================*/
-/* line 383, ../scss/style.scss */
-.tooltip-holder {
-  text-align: center;
-  font-family: arial, helvetica, sans-serif;
-}
-
-/* line 389, ../scss/style.scss */
-.tooltip.ne {
-  position: relative;
-}
-/* line 304, ../scss/style.scss */
-.tooltip.ne:before, .tooltip.ne:after {
-  opacity: 0;
-  z-index: 98;
-  -moz-transition: opacity 300ms, visibility 0ms linear 300ms;
-  -o-transition: opacity 300ms, visibility 0ms linear 300ms;
-  -webkit-transition: opacity 300ms, visibility 0ms linear;
-  -webkit-transition-delay: 0s, 300ms;
-  transition: opacity 300ms, visibility 0ms linear 300ms;
-  pointer-events: none;
-}
-@media (max-width: 480px) {
-  /* line 304, ../scss/style.scss */
-  .tooltip.ne:before, .tooltip.ne:after {
-    display: none;
-  }
-}
-/* line 311, ../scss/style.scss */
-.tooltip.ne:before {
-  content: attr(data-tooltip);
-  position: absolute;
-  width: 230px;
-  padding: 10px 15px;
-  line-height: 18px;
-  text-align: left;
-  font-size: 13px;
-  font-weight: normal;
-  white-space: normal;
-  word-break: break-all;
-  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
-  border-radius: 3px;
-  background-color: #0275a8;
-  color: #fff;
-}
-/* line 331, ../scss/style.scss */
-.tooltip.ne:after {
-  content: '';
-}
-/* line 335, ../scss/style.scss */
-.tooltip.ne:before {
-  top: -9px;
-  bottom: auto;
-  -moz-transform: translateY(-100%);
-  -ms-transform: translateY(-100%);
-  -webkit-transform: translateY(-100%);
-  transform: translateY(-100%);
-}
-/* line 339, ../scss/style.scss */
-.tooltip.ne:after {
-  content: '';
-  display: block;
-  position: absolute;
-  height: 0;
-  width: 0;
-  border-top: 6px solid #0275a8;
-  border-left: 6px solid transparent;
-  border-right: 6px solid transparent;
-  border-bottom: none;
-  top: -9px;
-  bottom: auto;
-}
-/* line 357, ../scss/style.scss */
-.tooltip.ne:before, .tooltip.ne:after {
-  left: 50%;
-  right: auto;
-  margin-left: -6px;
-}
-/* line 361, ../scss/style.scss */
-.tooltip.ne:before {
-  margin-left: -18px;
-}
-/* line 373, ../scss/style.scss */
-.tooltip.ne:hover {
-  /* putting comment here so :hover is declared first by itself to fix ie10 bug with transitions on psuedo elements- http://css-tricks.com/pseudo-element-animationstransitions-bug-fixed-in-webkit/ */
-}
-/* line 375, ../scss/style.scss */
-.tooltip.ne:hover:before, .tooltip.ne:hover:after {
-  opacity: 1;
-  pointer-events: all;
-  -moz-transition-delay: 0ms;
-  -o-transition-delay: 0ms;
-  -webkit-transition-delay: 0ms;
-  transition-delay: 0ms;
-}
-/* line 390, ../scss/style.scss */
-.tooltip.nw {
-  position: relative;
-}
-/* line 304, ../scss/style.scss */
-.tooltip.nw:before, .tooltip.nw:after {
-  opacity: 0;
-  z-index: 98;
-  -moz-transition: opacity 300ms, visibility 0ms linear 300ms;
-  -o-transition: opacity 300ms, visibility 0ms linear 300ms;
-  -webkit-transition: opacity 300ms, visibility 0ms linear;
-  -webkit-transition-delay: 0s, 300ms;
-  transition: opacity 300ms, visibility 0ms linear 300ms;
-  pointer-events: none;
-}
-@media (max-width: 480px) {
-  /* line 304, ../scss/style.scss */
-  .tooltip.nw:before, .tooltip.nw:after {
-    display: none;
-  }
-}
-/* line 311, ../scss/style.scss */
-.tooltip.nw:before {
-  content: attr(data-tooltip);
-  position: absolute;
-  width: 230px;
-  padding: 10px 15px;
-  line-height: 18px;
-  text-align: left;
-  font-size: 13px;
-  font-weight: normal;
-  white-space: normal;
-  word-break: break-all;
-  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
-  border-radius: 3px;
-  background-color: #0275a8;
-  color: #fff;
-}
-/* line 331, ../scss/style.scss */
-.tooltip.nw:after {
-  content: '';
-}
-/* line 335, ../scss/style.scss */
-.tooltip.nw:before {
-  top: -9px;
-  bottom: auto;
-  -moz-transform: translateY(-100%);
-  -ms-transform: translateY(-100%);
-  -webkit-transform: translateY(-100%);
-  transform: translateY(-100%);
-}
-/* line 339, ../scss/style.scss */
-.tooltip.nw:after {
-  content: '';
-  display: block;
-  position: absolute;
-  height: 0;
-  width: 0;
-  border-top: 6px solid #0275a8;
-  border-left: 6px solid transparent;
-  border-right: 6px solid transparent;
-  border-bottom: none;
-  top: -9px;
-  bottom: auto;
-}
-/* line 364, ../scss/style.scss */
-.tooltip.nw:before, .tooltip.nw:after {
-  right: 50%;
-  left: auto;
-  margin-right: -6px;
-}
-/* line 368, ../scss/style.scss */
-.tooltip.nw:before {
-  margin-right: -18px;
-}
-/* line 373, ../scss/style.scss */
-.tooltip.nw:hover {
-  /* putting comment here so :hover is declared first by itself to fix ie10 bug with transitions on psuedo elements- http://css-tricks.com/pseudo-element-animationstransitions-bug-fixed-in-webkit/ */
-}
-/* line 375, ../scss/style.scss */
-.tooltip.nw:hover:before, .tooltip.nw:hover:after {
-  opacity: 1;
-  pointer-events: all;
-  -moz-transition-delay: 0ms;
-  -o-transition-delay: 0ms;
-  -webkit-transition-delay: 0ms;
-  transition-delay: 0ms;
-}
-/* line 391, ../scss/style.scss */
-.tooltip.se {
-  position: relative;
-}
-/* line 304, ../scss/style.scss */
-.tooltip.se:before, .tooltip.se:after {
-  opacity: 0;
-  z-index: 98;
-  -moz-transition: opacity 300ms, visibility 0ms linear 300ms;
-  -o-transition: opacity 300ms, visibility 0ms linear 300ms;
-  -webkit-transition: opacity 300ms, visibility 0ms linear;
-  -webkit-transition-delay: 0s, 300ms;
-  transition: opacity 300ms, visibility 0ms linear 300ms;
-  pointer-events: none;
-}
-@media (max-width: 480px) {
-  /* line 304, ../scss/style.scss */
-  .tooltip.se:before, .tooltip.se:after {
-    display: none;
-  }
-}
-/* line 311, ../scss/style.scss */
-.tooltip.se:before {
-  content: attr(data-tooltip);
-  position: absolute;
-  width: 230px;
-  padding: 10px 15px;
-  line-height: 18px;
-  text-align: left;
-  font-size: 13px;
-  font-weight: normal;
-  white-space: normal;
-  word-break: break-all;
-  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
-  border-radius: 3px;
-  background-color: #0275a8;
-  color: #fff;
-}
-/* line 331, ../scss/style.scss */
-.tooltip.se:after {
-  content: '';
-}
-/* line 345, ../scss/style.scss */
-.tooltip.se:before {
-  bottom: -9px;
-  top: auto;
-  -moz-transform: translateY(100%);
-  -ms-transform: translateY(100%);
-  -webkit-transform: translateY(100%);
-  transform: translateY(100%);
-}
-/* line 349, ../scss/style.scss */
-.tooltip.se:after {
-  content: '';
-  display: block;
-  position: absolute;
-  height: 0;
-  width: 0;
-  border-bottom: 6px solid #0275a8;
-  border-left: 6px solid transparent;
-  border-right: 6px solid transparent;
-  border-top: none;
-  bottom: -9px;
-  top: auto;
-}
-/* line 357, ../scss/style.scss */
-.tooltip.se:before, .tooltip.se:after {
-  left: 50%;
-  right: auto;
-  margin-left: -6px;
-}
-/* line 361, ../scss/style.scss */
-.tooltip.se:before {
-  margin-left: -18px;
-}
-/* line 373, ../scss/style.scss */
-.tooltip.se:hover {
-  /* putting comment here so :hover is declared first by itself to fix ie10 bug with transitions on psuedo elements- http://css-tricks.com/pseudo-element-animationstransitions-bug-fixed-in-webkit/ */
-}
-/* line 375, ../scss/style.scss */
-.tooltip.se:hover:before, .tooltip.se:hover:after {
-  opacity: 1;
-  pointer-events: all;
-  -moz-transition-delay: 0ms;
-  -o-transition-delay: 0ms;
-  -webkit-transition-delay: 0ms;
-  transition-delay: 0ms;
-}
-/* line 392, ../scss/style.scss */
-.tooltip.sw {
-  position: relative;
-}
-/* line 304, ../scss/style.scss */
-.tooltip.sw:before, .tooltip.sw:after {
-  opacity: 0;
-  z-index: 98;
-  -moz-transition: opacity 300ms, visibility 0ms linear 300ms;
-  -o-transition: opacity 300ms, visibility 0ms linear 300ms;
-  -webkit-transition: opacity 300ms, visibility 0ms linear;
-  -webkit-transition-delay: 0s, 300ms;
-  transition: opacity 300ms, visibility 0ms linear 300ms;
-  pointer-events: none;
-}
-@media (max-width: 480px) {
-  /* line 304, ../scss/style.scss */
-  .tooltip.sw:before, .tooltip.sw:after {
-    display: none;
-  }
-}
-/* line 311, ../scss/style.scss */
-.tooltip.sw:before {
-  content: attr(data-tooltip);
-  position: absolute;
-  width: 230px;
-  padding: 10px 15px;
-  line-height: 18px;
-  text-align: left;
-  font-size: 13px;
-  font-weight: normal;
-  white-space: normal;
-  word-break: break-all;
-  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
-  border-radius: 3px;
-  background-color: #0275a8;
-  color: #fff;
-}
-/* line 331, ../scss/style.scss */
-.tooltip.sw:after {
-  content: '';
-}
-/* line 345, ../scss/style.scss */
-.tooltip.sw:before {
-  bottom: -9px;
-  top: auto;
-  -moz-transform: translateY(100%);
-  -ms-transform: translateY(100%);
-  -webkit-transform: translateY(100%);
-  transform: translateY(100%);
-}
-/* line 349, ../scss/style.scss */
-.tooltip.sw:after {
-  content: '';
-  display: block;
-  position: absolute;
-  height: 0;
-  width: 0;
-  border-bottom: 6px solid #0275a8;
-  border-left: 6px solid transparent;
-  border-right: 6px solid transparent;
-  border-top: none;
-  bottom: -9px;
-  top: auto;
-}
-/* line 364, ../scss/style.scss */
-.tooltip.sw:before, .tooltip.sw:after {
-  right: 50%;
-  left: auto;
-  margin-right: -6px;
-}
-/* line 368, ../scss/style.scss */
-.tooltip.sw:before {
-  margin-right: -18px;
-}
-/* line 373, ../scss/style.scss */
-.tooltip.sw:hover {
-  /* putting comment here so :hover is declared first by itself to fix ie10 bug with transitions on psuedo elements- http://css-tricks.com/pseudo-element-animationstransitions-bug-fixed-in-webkit/ */
-}
-/* line 375, ../scss/style.scss */
-.tooltip.sw:hover:before, .tooltip.sw:hover:after {
-  opacity: 1;
-  pointer-events: all;
-  -moz-transition-delay: 0ms;
-  -o-transition-delay: 0ms;
-  -webkit-transition-delay: 0ms;
-  transition-delay: 0ms;
 }
 
 /*===================================
 =            Loading bar            =
 ===================================*/
-/* line 399, ../scss/style.scss */
+/* line 289, ../scss/style.scss */
 .loadbar {
   width: 95%;
   margin: 5px auto;
@@ -685,7 +380,7 @@ a, a:visited {
   -webkit-border-radius: 10px;
   border-radius: 10px;
 }
-/* line 406, ../scss/style.scss */
+/* line 296, ../scss/style.scss */
 .loadbar .loader {
   position: absolute;
   top: 0;
@@ -700,7 +395,7 @@ a, a:visited {
   border-radius: 10px;
 }
 
-/* line 419, ../scss/style.scss */
+/* line 309, ../scss/style.scss */
 .loadbar-info {
   width: 90%;
   margin: 0 auto;
@@ -709,23 +404,63 @@ a, a:visited {
   font-style: italic;
   min-height: 14px;
 }
-/* line 426, ../scss/style.scss */
+/* line 316, ../scss/style.scss */
 .loadbar-info a {
   color: #03A9F4 !important;
+}
+
+/* line 321, ../scss/style.scss */
+#download-percent {
+  background: #03A9F4;
+  padding: 2px 7px;
+  font-size: 1.4em;
+  color: #FAFAFA;
+  float: right;
+  margin-right: 2.5%;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  border-radius: 4px;
+  -moz-box-shadow: 0 0 7px rgba(3, 169, 244, 0.7);
+  -webkit-box-shadow: 0 0 7px rgba(3, 169, 244, 0.7);
+  box-shadow: 0 0 7px rgba(3, 169, 244, 0.7);
+  -moz-transition: background 200ms, box-shadow 200ms;
+  -o-transition: background 200ms, box-shadow 200ms;
+  -webkit-transition: background 200ms, box-shadow 200ms;
+  transition: background 200ms, box-shadow 200ms;
+}
+/* line 331, ../scss/style.scss */
+#download-percent:after {
+  content: '%';
+}
+/* line 334, ../scss/style.scss */
+#download-percent.idle {
+  background: #6e6e6e;
+  -moz-box-shadow: 0 0 7px rgba(110, 110, 110, 0.7);
+  -webkit-box-shadow: 0 0 7px rgba(110, 110, 110, 0.7);
+  box-shadow: 0 0 7px rgba(110, 110, 110, 0.7);
+  -moz-transition: background 200ms, box-shadow 200ms;
+  -o-transition: background 200ms, box-shadow 200ms;
+  -webkit-transition: background 200ms, box-shadow 200ms;
+  transition: background 200ms, box-shadow 200ms;
 }
 
 /*==============================
 =            Labels            =
 ==============================*/
-/* line 435, ../scss/style.scss */
+/* line 345, ../scss/style.scss */
 .label-error {
   color: #F44336 !important;
+}
+
+/* line 349, ../scss/style.scss */
+.label-warning {
+  color: #F79750 !important;
 }
 
 /*=============================
 =            Login            =
 =============================*/
-/* line 444, ../scss/style.scss */
+/* line 358, ../scss/style.scss */
 .login .basic-checkbox {
   margin-left: 10px;
   display: inline-block;

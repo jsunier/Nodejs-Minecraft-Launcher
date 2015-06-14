@@ -1,0 +1,5 @@
+{
+	"no_launcher" : "Aucun launcher n'a été défini et/ou trouvé",
+	"no_folder" : "Aucun dossier principal n'a été défini et/ou trouvé",
+	"cant_delete_folders" : "Les dossiers à supprimer n'existe pas" 
+}

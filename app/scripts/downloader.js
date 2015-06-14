@@ -35,63 +35,53 @@ function Downloader() {
  * @param {String} dir 
  */
 Downloader.prototype.setMainDir = function(dir) {
-	if (typeof dir != "undefined") {
-		Log.debug("Dossier principal défini sur '" + dir + "'");
-		this.main_dir = dir;
-		if (!endsWith(this.main_dir, '/')) {
-			this.main_dir += "/";
-		}
-		db('system.configurations').chain().first().assign({
-			minecraft_folder: dir
-		}).value();
-	}
-}
-
-/**
- * Récuperer les versions existantes
- * @param  {Function} callback 
- */
-Downloader.prototype.getVersions = function(callback) {
-	http.get(this.base_url + "launcher/versions.json", function(res) {
-	    var body = '';
-
-	    res.on('data', function(chunk) {
-	        body += chunk;
-	    });
-
-	    res.on('end', function() {
-	        var JSONResponse = JSON.parse(body);
-	        cache.set('remote_versions', JSONResponse);
-        	cache.save();
-        	callback(JSONResponse);
-	    });
-	}).on('error', function(e) {
-		Log.error("Erreur lors du chargement des versions: ", e);
-	    throw e;
-	});
-}
-
-/**
- * Vérifier si le launcher est à jour
- * @param  {Object}  versions JSON des versions (doit aussi contenir la version du launcher)
- * @return {Boolean}          true si une mise à jour est disponible et false si le launcher est à jour
- */
-Downloader.prototype.isUpToDate = function(local_version, callback) {
-	cache.load();
-	var remote_versions = cache.get('remote_versions');
-	if (typeof remote_versions == "undefined" || remote_versions == null) {
-		Log.error("Impossible de vérifier la version du launcher");
+	db.reload();
+	dir = path.normalize(dir);
+	if (dir != "") {
+		fs.stat(dir, function (err, stats) {
+			if (err) throw new Error(err);
+			Log.debug("Dossier principal défini sur '" + dir + "'");
+			this.main_dir = dir;
+			if (!endsWith(this.main_dir, '/')) {
+				this.main_dir += "/";
+			}
+			db.push('/system/configurations', {
+				minecraft_folder: this.main_dir
+			}, false);
+		});
 	}
 	else {
-		if (ivn(local_version, remote_versions.launcher)) {
-			Log.info("Une nouvelle version du launcher est disponible!");
-			window.doUpdate();
-		} else {
-		  	Log.info("Le launcher est à jour");
-		}
+		Log.warn(t.get('warn.no_folder'));
 	}
-	
-	callback();
+}
+
+Downloader.prototype.setLauncher = function(exe) {
+	db.reload();
+	if (exe === "" && exe != "") {
+		fs.stat(exe, function (err, stats) {
+			if (err) throw new Error(err);
+			switch(path.extname(exe)) {
+				case "exe":
+				case "jar":
+				case "ink":
+				case "app":
+				case "":
+					Log.debug("Launcher principal défini sur '" + exe + "'");
+					this.main_launcher = exe;
+					db.push('/system/configurations', {
+						minecraft_launcher: exe
+					}, false);
+					break;
+				default:
+					Log.error(t.get('error.bad_launcher'));
+					throw new Error(t.get('error.bad_launcher'));
+					break;
+			}
+		});
+	}
+	else {
+		Log.warn(t.get('warn.no_launcher'));
+	}
 }
 
 /**
@@ -99,12 +89,9 @@ Downloader.prototype.isUpToDate = function(local_version, callback) {
  * @param {Function} main_callback Callback
  */
 Downloader.prototype.getLocalHashes = function(main_callback) {
-	cache.load();
-	var main_dir = this.main_dir;
-	getFoldersHashes(this.scan_folders, main_dir, function(hashes) {
-		cache.clear('local_hash');
-	    cache.set('local_hash', hashes);
-	    cache.save();
+	db.reload();
+	getFoldersHashes(this.scan_folders, db.getData('/system/configurations').minecraft_folder, function(hashes) {
+		db.push('/minecraft/hashes/local', hashes);
 	    main_callback();
 	});
 }
@@ -114,9 +101,9 @@ Downloader.prototype.getLocalHashes = function(main_callback) {
  * @param  {Function} callback
  */
 Downloader.prototype.getRemoteHashes = function(callback) {
-	cache.load();
-	var version = cache.get('selected_version');
-	http.get(this.base_url + "ressources/index.php?version=" + version, function(res) {
+	db.reload();
+	var selected_version = db.getData('/launcher/selected_version');
+	http.get(this.base_url + "ressources/index.php?version=" + selected_version, function(res) {
 	    var body = '';
 
 	    res.on('data', function(chunk) {
@@ -125,12 +112,11 @@ Downloader.prototype.getRemoteHashes = function(callback) {
 
 	    res.on('end', function() {
 	        var JSONResponse = JSON.parse(body);
-	        cache.set('remote_hash', JSONResponse);
-	        cache.save();
+	        db.push('/minecraft/hashes/remote', JSONResponse);
 	        callback();
 	    });
 	}).on('error', function(e) {
-	    Log.error("Erreur lors du chargement des hashes: ", e);
+	    Log.error(t.get('error.loading_hashes'), e);
 	    throw e;
 	});
 }
@@ -140,10 +126,10 @@ Downloader.prototype.getRemoteHashes = function(callback) {
  * @param  {Function} callback
  */
 Downloader.prototype.getDifference = function(callback) {
-	cache.load();
-	var local_hashes = cache.get('local_hash');
-	var remote_hashes = cache.get('remote_hash');
-	var remote_versions = cache.get('remote_versions');
+	db.reload();
+	var local_hashes = db.getData('/minecraft/hashes/local');
+	var remote_hashes = db.getData('/minecraft/hashes/remote');
+	var remote_versions = db.getData('/minecraft/versions').all;
 	var local_files = new Array();
 	var remote_files = new Array();
 
@@ -156,16 +142,14 @@ Downloader.prototype.getDifference = function(callback) {
 		remote_files.push(hash.etag);
 	}
 
-	var difference = removeFolderHash(diffArray(remote_files, local_files)); // Difference entre local et distant (mods manquants)
-	var difference2 = removeFolderHash(diffArray(local_files, remote_files)); // Difference entre distant et local (mods en trop)
+	var missing = removeFolderHash(diffArray(remote_files, local_files)); // Difference entre local et distant (mods manquants)
+	var too = removeFolderHash(diffArray(local_files, remote_files)); // Difference entre distant et local (mods en trop)
 
-	cache.clear('difference');
-	cache.clear('difference2');
-	cache.set('difference', difference);
-	cache.set('difference2', difference2);
-	cache.save();
+	db.delete("/system/difference");
+	db.push('/system/difference/missing', missing);
+	db.push('/system/difference/too', too);
 
-	var version_file = this.main_dir + "usinacraft_version.txt";
+	var version_file = db.getData('/system/configurations').minecraft_folder + "usinacraft_version.txt";
 	
 	fs.stat(version_file, function(err, stat) {
 	    if(err == null) {
@@ -174,21 +158,20 @@ Downloader.prototype.getDifference = function(callback) {
 					Log.error(err);
 					callback();
 				}
-				cache.set('mods_version', data);
-				fs.writeFile(version_file, remote_versions.versions[cache.get('selected_version')], function(err) {
+				db.push('/minecraft/versions/local', data, false);
+				fs.writeFile(version_file, remote_versions[db.getData('/launcher/selected_version')], function(err) {
 					if(err) Log.error(err);
 					callback();
 				});
 			});
 	    } else if(err.code == 'ENOENT') {
-	        fs.writeFile(version_file, remote_versions.versions[cache.get('selected_version')], function(err) {
+	        fs.writeFile(version_file, remote_versions[db.getData('/launcher/selected_version')], function(err) {
 	        	if(err) Log.error(err);
-	        	cache.set('mods_version', remote_versions.versions[cache.get('selected_version')]);
-	        	cache.save();
+	        	db.push('/minecraft/versions/local', remote_versions[db.getData('/launcher/selected_version')]);
 	        	callback();
 	        });
 	    } else {
-	        Log.error('Impossible de déterminer la version locale des mods: ', err.code);
+	        Log.error(t.get('error.get_mods_local_version'), err.code);
 	        callback();
 	    }
 	});
@@ -199,13 +182,12 @@ Downloader.prototype.getDifference = function(callback) {
  * @param  {Function} main_callback
  */
 Downloader.prototype.deleteFolders = function(main_callback) {
-	cache.load();
-	var main_dir = this.main_dir, dest = null;
+	var dest = null;
 	async.eachSeries(this.remove_folders, function(folder, callback) {
-		dest = main_dir + folder;
+		dest = db.getData('/system/configurations').minecraft_folder + folder;
 		fs.exists(dest, function(exist) {
 			if(!exist) {
-				Log.info("Les dossiers à supprimer n'existe pas");
+				Log.warn(t.get('error.cant_delete_folders'));
 				callback();
 			}
 			fs.remove(dest, function(err) {
@@ -217,7 +199,7 @@ Downloader.prototype.deleteFolders = function(main_callback) {
 			});
 		});
 	}, function(err) {
-		Log.info("Suppression des dossiers terminée");
+		Log.info(t.get('downloader.delete_folders'));
 		main_callback();
 	});
 }
@@ -227,11 +209,11 @@ Downloader.prototype.deleteFolders = function(main_callback) {
  * @param  {Function} main_callback
  */
 Downloader.prototype.deleteOldFiles = function(main_callback) {
-	cache.load();
-	var difference = cache.get('difference2');
-	var local_files = cache.get('local_hash');
+	db.reload();
+	var difference = db.getData('/system/difference/too');
+	var local_hashes = db.getData('/minecraft/hashes/local');
 
-	async.eachSeries(local_files, function(file, callback) {
+	async.eachSeries(local_hashes, function(file, callback) {
 		if (difference.indexOf(file.hash) > -1 && difference.indexOf(file.hash) != false) {
 			Log.info("Suppression de : " + file.fullPath);
 			fs.remove(file.fullPath, function(err) {
@@ -243,7 +225,7 @@ Downloader.prototype.deleteOldFiles = function(main_callback) {
 			callback();
 	}, function(err) {
 		if (err) Log.error(err);
-		Log.info("Anciens mods supprimés!");
+		Log.info(t.get('downloader.done_delete_old_mods'));
 		main_callback();
 	});
 }
@@ -253,10 +235,10 @@ Downloader.prototype.deleteOldFiles = function(main_callback) {
  * @param  {Function} main_callback 
  */
 Downloader.prototype.downloadBase = function(main_callback) {
-	cache.load();
+	db.reload();
 	var types = [".jar", ".json"];
-	var selected_version = cache.get('selected_version');
-	var main_dir = this.main_dir;
+	var selected_version = db.getData('/launcher/selected_version');
+	var main_dir = db.getData('/system/configurations').minecraft_folder;
 	var dest = main_dir + "versions/" + selected_version + "/" + selected_version;
 	var url = this.base_url + 'ressources/' + selected_version + "/" + selected_version;
 
@@ -265,7 +247,7 @@ Downloader.prototype.downloadBase = function(main_callback) {
 		downloadFile(dest + type, url + type, callback);
 	}, function(err) {
 		if (err) Log.error(err);
-		Log.info("Téléchargement des fichiers de base terminé");
+		Log.info(t.get('downloader.done_base'));
 		main_callback();
 	});
 }
@@ -276,13 +258,11 @@ Downloader.prototype.downloadBase = function(main_callback) {
  * @param  {Function} main_callback 
  */
 Downloader.prototype.downloadFiles = function(force_update, main_callback) {
-	cache.load();
-	var main_dir = this.main_dir;
-	var selected_version = cache.get('selected_version');
-	var mods_version = cache.get('mods_version');
-	var last_version = cache.get('remote_versions');
-	var remote_files = cache.get('remote_hash');
-	var difference = cache.get('difference');
+	db.reload();
+	var main_dir = db.getData('/system/configurations').minecraft_folder;
+	var selected_version = db.getData('/launcher/selected_version');
+	var remote_files = db.getData('/minecraft/hashes/remote');
+	var difference = db.getData('/system/difference/missing');
 	var download_list = new Array();
 	var base_url = this.base_url;
 
@@ -308,7 +288,7 @@ Downloader.prototype.downloadFiles = function(force_update, main_callback) {
 		}
 	}, function(err) {
 		if (err) Log.error(err);
-		Log.info('Téléchargement des fichiers terminé.');
+		Log.info(t.get('downloader.done_files'));
 		main_callback();
 	});
 
@@ -319,11 +299,11 @@ Downloader.prototype.downloadFiles = function(force_update, main_callback) {
  * @param  {Function} main_callback
  */
 Downloader.prototype.downloadLibraries = function(main_callback) {
-	cache.load();
+	db.reload();
 	var download_list = new Array();
-	var main_dir = this.main_dir;
-	var selected_version = cache.get('selected_version');
-	var remote_files = cache.get('remote_hash');
+	var main_dir = db.getData('/system/configurations').minecraft_folder;
+	var selected_version = db.getData('/launcher/selected_version');
+	var remote_files = db.getData('/minecraft/hashes/remote');
 	var base_url = this.base_url;
 
 	for(var file in remote_files.libraries) {
@@ -346,7 +326,7 @@ Downloader.prototype.downloadLibraries = function(main_callback) {
 		}
 	}, function(err) {
 		if (err) Log.error(err);
-		Log.info('Téléchargement des librairies terminé.');
+		Log.info(t.get('downloader.done_libraries'));
 		main_callback();
 	});
 }
@@ -379,9 +359,10 @@ function downloadFile(dest, url, callback) {
 
 			    res.on('data', function(chunk) {
 			    	cur += chunk.length;
-			    	percent = (100.0 * cur / len).toFixed(2) + "%";
-			    	loader.style.width = percent;
-			    	Log.info("Téléchargement de " + basename + " en cours... " + percent, true);
+			    	percent = (100.0 * cur / len);
+			    	window.setLoad(percent.toFixed(0));
+			    	loader.style.width = percent.toFixed(2) + "%";
+			    	Log.info("Téléchargement de " + basename + " en cours...", true);
 			    });
 
 			    res.on('end', function() {

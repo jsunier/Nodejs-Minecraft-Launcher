@@ -3,11 +3,13 @@
 =================================*/
 
 $basic_red: #F44336;
+$basic_dark_red: #B71C1C;
 $basic_orange: #F79750;
 $basic_blue: #03A9F4;
 $basic_green: #4CAF50;
 $basic_white: #FAFAFA;
 $basic_black: #212121;
+$basic_transparent_background: rgba(50,50,50,0.85);
 $disabled_color: lighten($basic_black, 30%);
 
 $smartphone: 480px;
